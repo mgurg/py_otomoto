@@ -1,2 +1,4 @@
 # ignore generated csv files
 *.csv
+
+.vscode
