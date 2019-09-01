@@ -33,6 +33,8 @@ for i in range(1, lastPage):
             pass
 
         price = car.find('span',class_='offer-price__number').text.strip()
+        price = price.replace(" ", "")
+        print(price)
         carFile.write(price[:-4] + ',' )
 
         city = car.find('span',class_='ds-location-city').text.strip()
@@ -45,7 +47,10 @@ for i in range(1, lastPage):
         carFile.write(title + ',' )
         params = car.find_all("li", class_='offer-item__params-item')
         for param in params:
-            carFile.write(param.text.strip()+ ',')
+            strip_txt = param.text.strip()
+            strip_txt = strip_txt.replace(" ", "")
+
+            carFile.write(strip_txt+ ',')
         carFile.write('\n')
     
 carFile.close()
