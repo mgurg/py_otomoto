@@ -26,7 +26,9 @@ for i in range(1, lastPage):
     res.raise_for_status()
     currentPage = bs4.BeautifulSoup(res.text, features='lxml')
     carList = currentPage.select('article.offer-item')
+
     print("parsing page " + str(i))
+    
     for car in carList:
         #get the interesting data and write to file
         try:
@@ -48,6 +50,7 @@ for i in range(1, lastPage):
         title = car.find('a',class_='offer-title__link').text.strip()
         carFile.write(title + ',' )
         params = car.find_all("li", class_='offer-item__params-item')
+
         for param in params:
             strip_txt = param.text.strip()
             strip_txt = strip_txt.replace(" ", "") # remove empty spaces
