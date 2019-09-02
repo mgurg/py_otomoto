@@ -34,7 +34,6 @@ for i in range(1, lastPage):
 
         price = car.find('span',class_='offer-price__number').text.strip()
         price = price.replace(" ", "")
-        print(price)
         carFile.write(price[:-4] + ',' )
 
         city = car.find('span',class_='ds-location-city').text.strip()

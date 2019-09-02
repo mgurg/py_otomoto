@@ -18,12 +18,10 @@ for counter, row in df1.iterrows():
 
     for index, row in df2.iterrows():
         if (df1_IDX == row['IDX']):
-            counter = df1.iloc[i-1,9]
             print(df2.iloc[i-1,1]) 
-            inc_counter= counter+1
             
-            df1.at[i-1, 'Duration'] = inc_counter
-            df1.at[i-1, 'EndPrice'] = df2.iloc[index,1]
+            df1.at[i-1, 'Duration'] = df1.iloc[i-1,9] +1 # increase day counter
+            df1.at[i-1, 'EndPrice'] = df2.iloc[index,1] # assign last price from today file
 
 
 print(df1)
