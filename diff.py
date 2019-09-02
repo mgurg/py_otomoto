@@ -24,4 +24,5 @@ for counter, row in df1.iterrows():
             df1.at[i-1, 'EndPrice'] = df2.iloc[index,1] # assign last price from today file
 
 
+export_csv = df1.to_csv (r'.\dataframe.csv', index = None, header=True) #Don't forget to add '.csv' at the end of the path
 print(df1)
