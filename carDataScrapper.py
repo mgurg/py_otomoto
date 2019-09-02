@@ -18,6 +18,9 @@ carFile = io.open(fname, 'w', encoding="utf-8")
 carSoup = bs4.BeautifulSoup(res.text, features="lxml")
 lastPage = int(carSoup.select('.page')[-1].text)
 
+#csv file header
+carFile.write('IDX,Price,City,Region,Model,Year,Mileage,Displacement,Petrol'+'\n')
+
 for i in range(1, lastPage):
     res = requests.get(path + '?page=' + str(i))
     res.raise_for_status()
