@@ -50,9 +50,11 @@ for i in range(1, lastPage):
         params = car.find_all("li", class_='offer-item__params-item')
         for param in params:
             strip_txt = param.text.strip()
-            strip_txt = strip_txt.replace(" ", "")
+            strip_txt = strip_txt.replace(" ", "") # remove empty spaces
+            strip_txt = strip_txt.replace("km", "") # remove km symbol
+            strip_txt = strip_txt.replace("cm3", "") # remove cm3 symbol
 
-            carFile.write(strip_txt+ ',')
+            carFile.write(strip_txt+ ',')   
         carFile.write('\n')
     
 carFile.close()
