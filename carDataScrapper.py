@@ -21,7 +21,7 @@ lastPage = int(carSoup.select('.page')[-1].text)
 #csv file header
 carFile.write('IDX,Price,City,Region,Model,Year,Mileage,Displacement,Petrol'+'\n')
 
-for i in range(1, lastPage):
+for i in range(1, lastPage+1):
     res = requests.get(path + '?page=' + str(i))
     res.raise_for_status()
     currentPage = bs4.BeautifulSoup(res.text, features='lxml')
