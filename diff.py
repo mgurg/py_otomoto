@@ -2,6 +2,9 @@ import pandas, sys, time
 
 start = time.time()
 
+# file1 ='_ALL.csv'
+# file2 ='_NEW.csv' 
+
 file1 ='current.csv'
 file2 ='Data_2019-09-04.csv' 
 
@@ -18,7 +21,14 @@ df2 = pandas.read_csv(file2,skiprows = 1,
 
 i=0
 
-#sys.exit()
+#-----------START OPTIMISATION-----------
+
+# for i, row in enumerate(df1.itertuples(), 1):
+#     print(i, row.IDX)
+
+# sys.exit()
+
+#-----------END OPTIMISATION-----------
 
 df2['Start']='2019-09-04' # or: print(file2[5:15])
 
@@ -41,17 +51,19 @@ df4 = pandas.read_csv('dataframe.csv',skiprows = 1,
 #df4['Duration'].fillna(0) 
 #df4.fillna(0, inplace=True) 
 
-for counter, row in df4.iterrows():
-    df4_IDX = row['IDX']
+# for counter, row in df4.iterrows():
+for j, row in enumerate(df4.itertuples(), 1):
+    df4_IDX = row.IDX
     i=i+1
-    print(counter)
+    print(j)
 
-    for index, row in df2.iterrows():
-        if (df4_IDX == row['IDX']):
+    #for index, row in df2.iterrows():
+    for k, row in enumerate(df2.itertuples(), 1):
+        if (df4_IDX == row.IDX):
             #print(df4.at[i-1, 'Duration']+1) 
             
             df4.at[i-1, 'Duration'] = df4.iloc[i-1,10] + 1 # increase day counter
-            df4.at[i-1, 'EndPrice'] = df2.iloc[index,1] # assign last price from today file
+            df4.at[i-1, 'EndPrice'] = df2.iloc[k-1,1] # assign last price from today file
 
 #print('DF4')
 #print (df4.dtypes)
