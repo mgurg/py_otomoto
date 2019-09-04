@@ -1,4 +1,8 @@
 # ignore generated csv files
 *.csv
+*.db3
 
+
+# ignore folders
+data
 .vscode

@@ -1,4 +1,59 @@
 import pandas, sys, time
+import sqlite3
+
+# ---------- SQLite ----------
+
+def create_connection(db_file):
+    """ create a database connection to a SQLite database """
+    conn = None
+    try:
+        conn = sqlite3.connect(db_file)
+        return conn
+    except Error as e:
+        print(e)
+ 
+    return conn
+
+def create_table(conn, create_table_sql):
+    """ create a table from the create_table_sql statement
+    :param conn: Connection object
+    :param create_table_sql: a CREATE TABLE statement
+    :return:
+    """
+    try:
+        c = conn.cursor()
+        c.execute(create_table_sql)
+    except Error as e:
+        print(e)    
+
+database = "data\mydb.db3"
+sql_create_projects_table = """ CREATE TABLE IF NOT EXISTS projects (
+                                    id integer PRIMARY KEY,
+                                    price integer,
+                                    city text,
+                                    region text,
+                                    model text,
+                                    year integer,
+                                    mileage integer,
+                                    displacement integer,
+                                    petrol text,
+                                    start text,
+                                    duration integer,
+                                    endPrice integer
+                                    ); """
+
+# create a database connection
+conn = create_connection(database)
+ 
+# create tables
+if conn is not None:
+    # create table
+    create_table(conn, sql_create_projects_table)
+ 
+else:
+    print("Error! cannot create the database connection.")
+
+# ---------- SQLite ----------
 
 start = time.time()
 
@@ -23,10 +78,8 @@ i=0
 
 #-----------START OPTIMISATION-----------
 
-# for i, row in enumerate(df1.itertuples(), 1):
-#     print(i, row.IDX)
-
-# sys.exit()
+df1.to_sql(name='projects', index=False, con=conn, if_exists='replace')
+sys.exit()
 
 #-----------END OPTIMISATION-----------
 
@@ -48,19 +101,13 @@ df4 = pandas.read_csv('dataframe.csv',skiprows = 1,
                   names = names, 
                   encoding='utf-8')
 
-#df4['Duration'].fillna(0) 
-#df4.fillna(0, inplace=True) 
-
-# for counter, row in df4.iterrows():
 for j, row in enumerate(df4.itertuples(), 1):
     df4_IDX = row.IDX
     i=i+1
     print(j)
 
-    #for index, row in df2.iterrows():
     for k, row in enumerate(df2.itertuples(), 1):
         if (df4_IDX == row.IDX):
-            #print(df4.at[i-1, 'Duration']+1) 
             
             df4.at[i-1, 'Duration'] = df4.iloc[i-1,10] + 1 # increase day counter
             df4.at[i-1, 'EndPrice'] = df2.iloc[k-1,1] # assign last price from today file
@@ -71,5 +118,12 @@ for j, row in enumerate(df4.itertuples(), 1):
 
 export_csv = df4.to_csv (r'.\dataframe2.csv', index = None, header=True, encoding="utf-8") #Don't forget to add '.csv' at the end of the path
 
+
+df4.to_sql(name='projects', con=DB, if_exists='replace')
+
 end = time.time()
 print(end - start)
+
+
+
+
