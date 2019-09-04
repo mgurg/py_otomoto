@@ -1,26 +1,26 @@
-import pandas, datetime
+import pandas, sys, time
 
-now = datetime.datetime.now()
+start = time.time()
+
+file1 ='current.csv'
+file2 ='Data_2019-09-04.csv' 
 
 names = ['IDX','Price','City', 'Region', 'Model', 'Year', 'Mileage', 'Displacement', 'Petrol', 'Start', 'Duration', 'EndPrice']
-df1 = pandas.read_csv('current.csv',skiprows = 1, 
+df1 = pandas.read_csv(file1,skiprows = 1, 
                   index_col=False, 
                   names = names, 
                   encoding='utf-8')
 
-df2 = pandas.read_csv('Data_2019-09-04.csv',skiprows = 1, 
+df2 = pandas.read_csv(file2,skiprows = 1, 
                   index_col=False, 
                   names = names, 
                   encoding='utf-8')
 
 i=0
-#print ('df1')
-#print (df1)
 
-#print ('df2')
-#print (df2)
+#sys.exit()
 
-df2['Start']='2019-09-04' #now.date()
+df2['Start']='2019-09-04' # or: print(file2[5:15])
 
 df3 = pandas.DataFrame(pandas.concat([df1, df2], ignore_index=True))
 df3 = df3.drop_duplicates(subset=['IDX'])
@@ -53,8 +53,11 @@ for counter, row in df4.iterrows():
             df4.at[i-1, 'Duration'] = df4.iloc[i-1,10] + 1 # increase day counter
             df4.at[i-1, 'EndPrice'] = df2.iloc[index,1] # assign last price from today file
 
-print('DF4')
-print (df4.dtypes)
-print(df4)
+#print('DF4')
+#print (df4.dtypes)
+#print(df4)
 
 export_csv = df4.to_csv (r'.\dataframe2.csv', index = None, header=True, encoding="utf-8") #Don't forget to add '.csv' at the end of the path
+
+end = time.time()
+print(end - start)
