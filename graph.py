@@ -54,14 +54,14 @@ else:
     print("Error! cannot create the database connection.")
 
 
-def select_all_tasks(conn):
+def select_all_tasks(conn, year):
     """
     Query all rows in the tasks table
     :param conn: the Connection object
     :return:
     """
     cur = conn.cursor()
-    cur.execute("SELECT * FROM projects WHERE year=2008")
+    cur.execute("SELECT * FROM projects WHERE year=?", (year,))
  
     rows = cur.fetchall()
  
@@ -69,7 +69,7 @@ def select_all_tasks(conn):
         print(row)
 
 
-select_all_tasks(conn)
+select_all_tasks(conn, 2008)
 
 # ---------- SQLite ----------
 
