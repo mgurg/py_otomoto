@@ -78,8 +78,8 @@ i=0
 
 #-----------START OPTIMISATION-----------
 
-df1.to_sql(name='projects', index=False, con=conn, if_exists='replace')
-sys.exit()
+# df1.to_sql(name='projects', index=False, con=conn, if_exists='replace')
+# sys.exit()
 
 #-----------END OPTIMISATION-----------
 
@@ -119,7 +119,7 @@ for j, row in enumerate(df4.itertuples(), 1):
 export_csv = df4.to_csv (r'.\dataframe2.csv', index = None, header=True, encoding="utf-8") #Don't forget to add '.csv' at the end of the path
 
 
-df4.to_sql(name='projects', con=DB, if_exists='replace')
+df4.to_sql(name='projects', index=False, con=conn, if_exists='replace')
 
 end = time.time()
 print(end - start)
