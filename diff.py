@@ -1,5 +1,11 @@
 import pandas, sys, time
 import sqlite3
+import os
+
+import os
+for file in os.listdir("./"):
+    if file.endswith(".csv"):
+        print(os.path.join(file))
 
 # ---------- SQLite ----------
 
@@ -57,11 +63,12 @@ else:
 
 start = time.time()
 
-# file1 ='_ALL.csv'
-# file2 ='_NEW.csv' 
-
-file1 ='current.csv'
-file2 ='Data_2019-09-04.csv' 
+# file1 ='_EMPTY.csv'
+# file2 ='_NEW.csv'
+#  
+#file1 ='_EMPTY.csv'
+file1 ='_result.csv'
+file2 ='Data___2019-09-05.csv' 
 
 names = ['IDX','Price','City', 'Region', 'Model', 'Year', 'Mileage', 'Displacement', 'Petrol', 'Start', 'Duration', 'EndPrice']
 df1 = pandas.read_csv(file1,skiprows = 1, 
@@ -79,11 +86,12 @@ i=0
 #-----------START OPTIMISATION-----------
 
 # df1.to_sql(name='projects', index=False, con=conn, if_exists='replace')
-# sys.exit()
+#print(file2[7:17])
+#sys.exit()
 
 #-----------END OPTIMISATION-----------
 
-df2['Start']='2019-09-04' # or: print(file2[5:15])
+df2['Start']=file2[7:17] # or: print(file2[5:15])
 
 df3 = pandas.DataFrame(pandas.concat([df1, df2], ignore_index=True))
 df3 = df3.drop_duplicates(subset=['IDX'])
@@ -91,15 +99,15 @@ df3 = df3.drop_duplicates(subset=['IDX'])
 df3['Start'].fillna(0) 
 df3['Duration'].fillna(0) 
 
-export_csv = df3.to_csv (r'.\dataframe.csv', index = None, header=True, encoding="utf-8") #Don't forget to add '.csv' at the end of the path
+export_csv = df3.to_csv (r'.\_dataframe.csv', index = None, header=True, encoding="utf-8") #Don't forget to add '.csv' at the end of the path
 
-print('DF3')
-print(df3) 
+# print('DF3')
+# print(df3) 
 
-df4 = pandas.read_csv('dataframe.csv',skiprows = 1, 
-                  index_col=False, 
-                  names = names, 
-                  encoding='utf-8')
+df4 = pandas.read_csv('_dataframe.csv',skiprows = 1, 
+                   index_col=False, 
+                   names = names, 
+                   encoding='utf-8')
 
 for j, row in enumerate(df4.itertuples(), 1):
     df4_IDX = row.IDX
@@ -116,7 +124,7 @@ for j, row in enumerate(df4.itertuples(), 1):
 #print (df4.dtypes)
 #print(df4)
 
-export_csv = df4.to_csv (r'.\dataframe2.csv', index = None, header=True, encoding="utf-8") #Don't forget to add '.csv' at the end of the path
+export_csv = df4.to_csv (r'.\_result.csv', index = None, header=True, encoding="utf-8") #Don't forget to add '.csv' at the end of the path
 
 
 df4.to_sql(name='projects', index=False, con=conn, if_exists='replace')
