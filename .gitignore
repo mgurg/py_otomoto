@@ -1,7 +1,9 @@
 # ignore generated csv files
 *.csv
 *.db3
-
+*.zip
+*.ods
+*.7z
 
 # ignore folders
 data
