@@ -57,7 +57,9 @@ for i in range(1, lastPage+1):
             strip_txt = strip_txt.replace("km", "") # remove km symbol
             strip_txt = strip_txt.replace("cm3", "") # remove cm3 symbol
 
-            carFile.write(strip_txt+ ',')   
+            carFile.write(strip_txt+ ',')  
+
+        carFile.write('0,0,0' )     
         carFile.write('\n')
     
 carFile.close()
