@@ -3,9 +3,14 @@ import sqlite3
 import os
 
 import os
-for file in os.listdir("./"):
+
+for file in os.listdir("./input/"):
     if file.endswith(".csv"):
-        print(os.path.join(file))
+        current_file = os.path.join(file)
+        print(current_file)
+
+sys.exit()
+
 
 # ---------- SQLite ----------
 
