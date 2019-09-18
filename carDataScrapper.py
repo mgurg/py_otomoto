@@ -34,31 +34,31 @@ for i in range(1, lastPage+1):
         try:
             ID = car.find('input', {'name': 'contact[adid]'}).get('value')
             carFile.write(ID + ',' )
+
+            price = car.find('span',class_='offer-price__number').text.strip()
+            price = price.replace(" ", "")
+            carFile.write(price[:-4] + ',' )
+
+            city = car.find('span',class_='ds-location-city').text.strip()
+            carFile.write(city + ',' )
+
+            region = car.find('span',class_='ds-location-region').text.strip()
+            carFile.write(region + ',' )
+
+            title = car.find('a',class_='offer-title__link').text.strip()
+            carFile.write(title + ',' )
+            params = car.find_all("li", class_='offer-item__params-item')
+
+            for param in params:
+                strip_txt = param.text.strip()
+                strip_txt = strip_txt.replace(" ", "") # remove empty spaces
+                strip_txt = strip_txt.replace("km", "") # remove km symbol
+                strip_txt = strip_txt.replace("cm3", "") # remove cm3 symbol
+
+                carFile.write(strip_txt+ ',')  
         except:
             pass
-
-        price = car.find('span',class_='offer-price__number').text.strip()
-        price = price.replace(" ", "")
-        carFile.write(price[:-4] + ',' )
-
-        city = car.find('span',class_='ds-location-city').text.strip()
-        carFile.write(city + ',' )
-
-        region = car.find('span',class_='ds-location-region').text.strip()
-        carFile.write(region + ',' )
-
-        title = car.find('a',class_='offer-title__link').text.strip()
-        carFile.write(title + ',' )
-        params = car.find_all("li", class_='offer-item__params-item')
-
-        for param in params:
-            strip_txt = param.text.strip()
-            strip_txt = strip_txt.replace(" ", "") # remove empty spaces
-            strip_txt = strip_txt.replace("km", "") # remove km symbol
-            strip_txt = strip_txt.replace("cm3", "") # remove cm3 symbol
-
-            carFile.write(strip_txt+ ',')  
-
+        
         carFile.write('0,0,0' )     
         carFile.write('\n')
     
