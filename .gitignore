@@ -4,6 +4,8 @@
 *.zip
 *.ods
 *.7z
+*.html
+*.ipynb
 
 # ignore folders
 data
