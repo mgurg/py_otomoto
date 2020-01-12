@@ -122,6 +122,7 @@ def merge_csv():
 
 for f in files:
     print(f)
+
     #parse_html2csv(f)
 
 merge_csv()
