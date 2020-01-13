@@ -19,7 +19,7 @@ for file in os.listdir("./"):
 
 def parse_html2csv(html_file : str): # PARSE HTML TO CSV
     #html_file = "otomoto_2019-12-31.html"
-    fname = 'carData_'+ html_file[8:18] +'.csv'
+    fname = 'otomoto_'+ html_file[8:18] +'.csv'
     carFile = io.open(fname, 'w', encoding="utf-8")
     #csv file header
     carFile.write('offer_id,city,region,model,year,mileage,fuel_type,displacement,price,currency,pub_date,duration,end_price'+'\n')
@@ -100,9 +100,9 @@ def parse_html2csv(html_file : str): # PARSE HTML TO CSV
     carFile.close()
 
 
-def merge_csv():
+def merge_csv(csv_file : str):
     #csv_file = "carData_2019-12-31.csv"
-    csv_file = "carData_2020-01-01.csv"
+    #csv_file = "carData_2020-01-01.csv"
 
     df2 = pd.read_csv(csv_file,index_col=False,encoding='utf-8')
 
@@ -115,17 +115,58 @@ def merge_csv():
     if my_df.empty:
         print('my_df is empty!')
         df2.to_csv('my_df.csv',index=False)
+        return #jump out from merge_csv(csv_file : str)
     else:
+        print('my_df is NOT empty!')
         my_df = pd.DataFrame(pd.concat([my_df, df2], ignore_index=True))
         my_df = my_df.drop_duplicates(subset=['offer_id'])
         my_df.to_csv('my_df.csv',index=False)
 
+    #--------------------------------------------------#
+
+def fill_csv(csv_file : str):
+
+    my_df = pd.read_csv('my_df.csv',
+                   index_col=False,
+                   encoding='utf-8')
+
+    df2 = pd.read_csv(csv_file,
+                  index_col=False,
+                  encoding='utf-8')
+
+
+    for j, jrow in enumerate(my_df.itertuples(), 1):
+        my_df_IDX = jrow.offer_id
+
+        for k, krow in enumerate(df2.itertuples(), 1):
+            if (my_df_IDX == krow.offer_id):
+                #print('i: '+ str(i) + ' / k: '+ str(k) + ' / j: ' + str(j) + ' ,shape: '+str(my_df.shape[0]))
+                #print(str(my_df.iloc[i-1]['offer_id']))
+                #print("-----------")
+                my_df.at[j-1, 'duration'] = my_df.iloc[j-1]['duration'] + 1 # increase day counter
+                my_df.at[j-1, 'end_price'] = df2.iloc[k-1]['price'] # assign last price from today file
+
+
+    #my_df['offer_id'] = my_df['offer_id'].astype('int64')
+    my_df.to_csv (r'.\my_df.csv', index = None, header=True, encoding="utf-8")
+
+    #--------------------------------------------------#
+
+def clean(file: str):
+    os.remove(file)
+
 for f in files:
-    print(f)
+    #print('----- START -----')
+    print('....')
+    parse_html2csv(f)
+    merge_csv(f[:-4]+'csv')
+    #print(f[:-4]+'csv'+' - done')
+    fill_csv(f[:-4]+'csv')
 
-    #parse_html2csv(f)
+    #fill_csv('otomoto_2020-01-03.csv')
+    print(f+' - done')
 
-merge_csv()
+
 
 end = timer()
 print(end - start)
