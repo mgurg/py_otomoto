@@ -5,22 +5,15 @@ from timeit import default_timer as timer
 import re
 import os
 import pandas as pd
+import shutil
 
 start = timer()
-
-# LIST ALL HTML FILES
-files = []
-
-for file in os.listdir("./"):
-    if file.endswith(".html"):
-        files.append(file)
-        #files.append(os.path.join("./", file))
-        #print(os.path.join("./", file))
 
 def parse_html2csv(html_file : str): # PARSE HTML TO CSV
     #html_file = "otomoto_2019-12-31.html"
     fname = 'otomoto_'+ html_file[8:18] +'.csv'
     carFile = io.open(fname, 'w', encoding="utf-8")
+
     #csv file header
     carFile.write('offer_id,city,region,model,year,mileage,fuel_type,displacement,price,currency,pub_date,duration,end_price'+'\n')
 
@@ -122,8 +115,6 @@ def merge_csv(csv_file : str):
         my_df = my_df.drop_duplicates(subset=['offer_id'])
         my_df.to_csv('my_df.csv',index=False)
 
-    #--------------------------------------------------#
-
 def fill_csv(csv_file : str):
 
     my_df = pd.read_csv('my_df.csv',
@@ -140,9 +131,7 @@ def fill_csv(csv_file : str):
 
         for k, krow in enumerate(df2.itertuples(), 1):
             if (my_df_IDX == krow.offer_id):
-                #print('i: '+ str(i) + ' / k: '+ str(k) + ' / j: ' + str(j) + ' ,shape: '+str(my_df.shape[0]))
-                #print(str(my_df.iloc[i-1]['offer_id']))
-                #print("-----------")
+
                 my_df.at[j-1, 'duration'] = my_df.iloc[j-1]['duration'] + 1 # increase day counter
                 my_df.at[j-1, 'end_price'] = df2.iloc[k-1]['price'] # assign last price from today file
 
@@ -150,20 +139,30 @@ def fill_csv(csv_file : str):
     #my_df['offer_id'] = my_df['offer_id'].astype('int64')
     my_df.to_csv (r'.\my_df.csv', index = None, header=True, encoding="utf-8")
 
-    #--------------------------------------------------#
 
 def clean(file: str):
-    os.remove(file)
+    destination = './archive/'
+    shutil.move(file, destination+file)
+    os.remove(file[:-4]+'csv')
+
+#--------------------------------------------------#
+
+# LIST ALL HTML FILES
+files = []
+
+for file in os.listdir("./"):
+    if file.endswith(".html"):
+        files.append(file)
+        #files.append(os.path.join("./", file))
+        #print(os.path.join("./", file))
 
 for f in files:
-    #print('----- START -----')
     print('....')
+    csv_file = f[:-4]+'csv'
     parse_html2csv(f)
-    merge_csv(f[:-4]+'csv')
-    #print(f[:-4]+'csv'+' - done')
-    fill_csv(f[:-4]+'csv')
-
-    #fill_csv('otomoto_2020-01-03.csv')
+    merge_csv(csv_file)
+    fill_csv(csv_file)
+    clean(f)
     print(f+' - done')
 
 
