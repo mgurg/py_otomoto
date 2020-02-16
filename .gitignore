@@ -5,10 +5,13 @@
 *.ods
 *.7z
 *.html
-*.ipynb
+*.png
+*.sh
+# *.ipynb
 
 # ignore folders
 data
 .vscode
+.ipynb_checkpoints
 archive
 

@@ -9,6 +9,9 @@ import shutil
 
 start = timer()
 
+
+# nice -n 10 python yourScript.py
+
 def parse_html2csv(html_file : str): # PARSE HTML TO CSV
     #html_file = "otomoto_2019-12-31.html"
     fname = 'otomoto_'+ html_file[8:18] +'.csv'
