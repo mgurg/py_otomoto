@@ -97,6 +97,7 @@ def parse_html2csv(html_file : str): # PARSE HTML TO CSV
 
 
 def merge_csv(csv_file : str):
+# merge two csv files form consecutive days  into one my_df file
     #csv_file = "carData_2019-12-31.csv"
     #csv_file = "carData_2020-01-01.csv"
 
@@ -119,7 +120,7 @@ def merge_csv(csv_file : str):
         my_df.to_csv('my_df.csv',index=False)
 
 def fill_csv(csv_file : str):
-
+# compare entries
     my_df = pd.read_csv('my_df.csv',
                    index_col=False,
                    encoding='utf-8')
