@@ -159,14 +159,18 @@ for file in os.listdir("./"):
         #files.append(os.path.join("./", file))
         #print(os.path.join("./", file))
 
-for f in files:
-    print('....')
-    csv_file = f[:-4]+'csv'
-    parse_html2csv(f)
-    merge_csv(csv_file)
-    fill_csv(csv_file)
-    clean(f)
-    print(f+' - done')
+
+if not files:
+  print("Nothing here")
+else:
+    for f in files:
+        print('....')
+        csv_file = f[:-4]+'csv'
+        parse_html2csv(f)
+        merge_csv(csv_file)
+        fill_csv(csv_file)
+        clean(f)
+        print(f+' - done')
 
 
 
