@@ -2,7 +2,9 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 from matplotlib import pyplot as plt
+from timeit import default_timer as timer
 
+start = timer()
 df = pd.read_csv('./my_df.csv')
 
 def general():
@@ -34,3 +36,6 @@ general()
 displacement()
 duration()
 mileage()
+
+end = timer()
+print(end - start)
