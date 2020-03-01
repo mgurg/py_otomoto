@@ -32,10 +32,9 @@ def execute_query(connection, query):
         print(f"The error '{e}' occurred")
 
 
+database = 'pythonsqlite.db'
 
-def main():
-    database = 'pythonsqlite.db'
-    sql_create_table = """ CREATE TABLE "cars" (
+sql_create_table = """CREATE TABLE "cars" (
 	"offer_id"	INTEGER NOT NULL,
 	"city"	TEXT,
 	"region"	TEXT,
@@ -48,24 +47,22 @@ def main():
 	"currency"	TEXT,
 	"pub_date"	TEXT,
 	"duration"	INTEGER,
-	"end_price"	INTEGER,
-	PRIMARY KEY("offer_id")
+	"end_price"	INTEGER
     );"""
      # create a database connection
 
-    create_users = """
+create_users = """
     INSERT INTO
     cars (offer_id,city,region,model,year,mileage,fuel_type,displacement,price,currency,pub_date,duration,end_price)
     VALUES
-    (6069449316,'Prudnik','Opolskie','Toyota Yaris II',2009,153000,'Diesel',-1,12999,'PLN','2019-12-31',7,12999);
+    (6069449316,'Prudnik','Opolskie','Toyota Yaris II',2009,153000,'Diesel',-1,12999,'PLN','2019-12-31',7,12999),
+    (6068202189,'Włocławek','Kujawsko-pomorskie','Toyota Yaris II',2008,110000,'Benzyna',1298,17600,'PLN','2019-12-31',21,16900),
+    (6067206317,'Łódź','Łódzkie','Toyota Yaris II',2010,167938,'Diesel',1364,13999,'PLN','2019-12-31',31,13900),
+    (6069421596,'Katowice','Śląskie','Toyota Yaris II',2008,214548,'Benzyna+LPG',1298,12000,'PLN','2019-12-31',31,12000),
+    (6068568066,'Katowice','Śląskie','Toyota Yaris II',2007,38000,'Benzyna',1298,19300,'PLN','2019-12-31',12,18500);
     """
 
 
-    conn = create_connection(database)
-    create_table(conn, sql_create_table)
-    execute_query(conn, create_users)
-
-#------------------
-
-
-main()
+conn = create_connection(database)
+create_table(conn, sql_create_table)
+execute_query(conn, create_users)
