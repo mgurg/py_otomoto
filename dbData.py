@@ -10,12 +10,28 @@ def create_connection(path):
         print(f"The error '{e}' occurred")
     return connection
 
-def create_table(conn, create_table_sql):
+def create_table(conn, table_name, create_table_sql=' '):
     """ create a table from the create_table_sql statement
     :param conn: Connection object
     :param create_table_sql: a CREATE TABLE statement
     :return:
     """
+    create_table_sql = """CREATE TABLE "{table_name}" (
+	"offer_id"	INTEGER NOT NULL,
+	"city"	TEXT,
+	"region"	TEXT,
+	"model"	TEXT,
+	"year"	INTEGER,
+	"mileage"	INTEGER,
+	"fuel_type"	TEXT,
+	"displacement"	INTEGER,
+	"price"	INTEGER,
+	"currency"	TEXT,
+	"pub_date"	TEXT,
+	"duration"	INTEGER,
+	"end_price"	INTEGER
+    );""".format(table_name=table_name)
+
     try:
         c = conn.cursor()
         c.execute(create_table_sql)
@@ -34,24 +50,10 @@ def execute_query(connection, query):
 
 database = 'pythonsqlite.db'
 
-sql_create_table = """CREATE TABLE "cars" (
-	"offer_id"	INTEGER NOT NULL,
-	"city"	TEXT,
-	"region"	TEXT,
-	"model"	TEXT,
-	"year"	INTEGER,
-	"mileage"	INTEGER,
-	"fuel_type"	TEXT,
-	"displacement"	INTEGER,
-	"price"	INTEGER,
-	"currency"	TEXT,
-	"pub_date"	TEXT,
-	"duration"	INTEGER,
-	"end_price"	INTEGER
-    );"""
+
      # create a database connection
 
-create_users = """
+create_users = '''
     INSERT INTO
     cars (offer_id,city,region,model,year,mileage,fuel_type,displacement,price,currency,pub_date,duration,end_price)
     VALUES
@@ -60,9 +62,9 @@ create_users = """
     (6067206317,'Łódź','Łódzkie','Toyota Yaris II',2010,167938,'Diesel',1364,13999,'PLN','2019-12-31',31,13900),
     (6069421596,'Katowice','Śląskie','Toyota Yaris II',2008,214548,'Benzyna+LPG',1298,12000,'PLN','2019-12-31',31,12000),
     (6068568066,'Katowice','Śląskie','Toyota Yaris II',2007,38000,'Benzyna',1298,19300,'PLN','2019-12-31',12,18500);
-    """
+    '''
 
 
-conn = create_connection(database)
-create_table(conn, sql_create_table)
-execute_query(conn, create_users)
+#conn = create_connection(database)
+#create_table(conn, sql_create_table)
+#execute_query(conn, create_users)

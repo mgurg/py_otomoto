@@ -6,6 +6,7 @@ import re
 import os
 import pandas as pd
 import shutil
+from dbData import *
 
 start = timer()
 
@@ -23,6 +24,17 @@ def parse_html2csv(html_file : str): # PARSE HTML TO CSV
     carSoup = bs4.BeautifulSoup(io.open(html_file, mode="r", encoding="utf-8"), "lxml")
     carList = carSoup.select('article.offer-item')
 
+    sql_header = """
+            INSERT INTO
+            cars (offer_id,city,region,model,year,mileage,fuel_type,displacement,price,currency,pub_date,duration,end_price)
+            VALUES
+        """
+    a = (sql_header,)
+    l = list(a)
+
+    conn = create_connection(database)
+    create_table(conn, fname[:-4])
+
     for car in carList:
         #OfferId = car.find('a', {'name': 'data-ad-id'}).get('value')
 
@@ -39,8 +51,8 @@ def parse_html2csv(html_file : str): # PARSE HTML TO CSV
 
         #params = car.find("li", class_='ds-param')
 
-        year = car.find("li", {"data-code" : "year"}).text
-        mileage = car.find("li", {"data-code" : "mileage"}).text[:-3].replace(" ", "")
+        year = car.find("li", {"data-code" : "year"}).text.strip()
+        mileage = car.find("li", {"data-code" : "mileage"}).text[:-3].replace(" ", "").strip()
 
         # try:
         #     displacement = car.find("li", {"data-code" : "engine_capacity"}).text[:-3].replace(" ", "")
@@ -53,12 +65,14 @@ def parse_html2csv(html_file : str): # PARSE HTML TO CSV
             displacement = displacement.get_text()[:-4].replace(" ", "").strip()
         else:
             print(offer_id + ' no displacement value')
-            displacement = -1
+            displacement = str(-1)
 
-        fuel_type = car.find("li", {"data-code" : "fuel_type"}).text
+        fuel_type = car.find("li", {"data-code" : "fuel_type"}).text.strip()
 
-        price = car.find('span',class_='offer-price__number').text.replace(" ", "")
-        currency = price[len(price)-4:]
+        price_currency = car.find('span',class_='offer-price__number').text.replace(" ", "")
+        price = price_currency.splitlines()[1]
+        #currency = price[len(price)-4:].strip()
+        currency = str(price_currency.splitlines()[2])
 
         pub_date = html_file[8:18]
         duration = "1"
@@ -83,16 +97,47 @@ def parse_html2csv(html_file : str): # PARSE HTML TO CSV
               city + ','+
               region  + ','+
               model + ','+
-              year.strip() + ','+
-              mileage.strip() + ','+
-              fuel_type.strip() + ','+
-              str(displacement) + ','+
-              price[:-4].strip() + ','+
-              currency.strip() + ','+
+              year + ','+
+              mileage + ','+
+              fuel_type + ','+
+              displacement + ','+
+              price + ','+
+              currency + ','+
               pub_date + ',' +
               duration + ',' +
               end_price + '\n'
               )
+
+        sql_rows = """("{offer_id}","{city}","{region}","{model}","{year}","{mileage}","{fuel_type}","{displacement}","{price}","{currency}","{pub_date}","{duration}","{end_price}"),
+        """.format(offer_id=offer_id,city=city,region=region,model=model,year=year,mileage=mileage,fuel_type=fuel_type,displacement=displacement,price=price,currency=currency,pub_date=pub_date,duration=duration,end_price=end_price)
+        #print(sql_rows)
+
+        l.append(sql_rows)
+
+        #print(l)
+
+        sql_query = """
+                    INSERT INTO
+                    cars (offer_id,city,region,model,year,mileage,fuel_type,displacement,price,currency,pub_date,duration,end_price)
+                    VALUES
+                    ("{offer_id}","{city}","{region}","{model}","{year}","{mileage}","{fuel_type}","{displacement}","{price}","{currency}","{pub_date}","{duration}","{end_price}");
+        """.format(offer_id=offer_id,city=city,region=region,model=model,year=year,mileage=mileage,fuel_type=fuel_type,displacement=displacement,price=price,currency=currency,pub_date=pub_date,duration=duration,end_price=end_price)
+
+
+    tuple(l)
+
+    sqlstement = '(' + ''.join(l) + ')'.strip()
+    last_char_index = sqlstement.rfind(",")
+    sqlstement1 = sqlstement[:last_char_index]+';'
+    #print(sqlstement)
+    #print(type(sqlstement))
+
+    execute_query(conn, sqlstement1[1:].strip())
+
+    #textfile = open('textfile.txt', 'w', encoding='utf-8')
+    #textfile.write(sqlstement1[1:].strip())
+    #textfile.close()
+
     carFile.close()
 
 
@@ -146,7 +191,7 @@ def fill_csv(csv_file : str):
 
 def clean(file: str):
     destination = './archive/'
-    shutil.move(file, destination+file)
+    #shutil.move(file, destination+file)
     os.remove(file[:-4]+'csv')
 
 #--------------------------------------------------#
@@ -166,6 +211,7 @@ if not files:
 else:
     for f in files:
         print('....')
+        #os.remove('my_df.csv')
         csv_file = f[:-4]+'csv'
         parse_html2csv(f)
         merge_csv(csv_file)
