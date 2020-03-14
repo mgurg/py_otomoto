@@ -50,7 +50,6 @@ def execute_query(connection, query):
 
 database = 'pythonsqlite.db'
 
-
      # create a database connection
 
 create_users = '''

@@ -6,43 +6,31 @@ import re
 import os
 import pandas as pd
 import shutil
-from dbData import *
+from dbData import create_connection,create_table,execute_query
 
 start = timer()
 
-
-# nice -n 10 python yourScript.py
-
 def parse_html2csv(html_file : str): # PARSE HTML TO CSV
-    #html_file = "otomoto_2019-12-31.html"
     fname = 'otomoto_'+ html_file[8:18] +'.csv'
-    carFile = io.open(fname, 'w', encoding="utf-8")
 
-    #csv file header
-    carFile.write('offer_id,city,region,model,year,mileage,fuel_type,displacement,price,currency,pub_date,duration,end_price'+'\n')
+    csv_header = 'offer_id,city,region,model,year,mileage,fuel_type,displacement,price,currency,pub_date,duration,end_price'+'\n'
+    csv_list=[csv_header]
+
+    sql_header = """
+            INSERT INTO
+            "{table_name}" (offer_id,city,region,model,year,mileage,fuel_type,displacement,price,currency,pub_date,duration,end_price)
+            VALUES
+        """.format(table_name= fname[:-4])
+
+    sql_list=[sql_header]
 
     carSoup = bs4.BeautifulSoup(io.open(html_file, mode="r", encoding="utf-8"), "lxml")
     carList = carSoup.select('article.offer-item')
 
-    sql_header = """
-            INSERT INTO
-            cars (offer_id,city,region,model,year,mileage,fuel_type,displacement,price,currency,pub_date,duration,end_price)
-            VALUES
-        """
-    a = (sql_header,)
-    l = list(a)
-
-    conn = create_connection(database)
-    create_table(conn, fname[:-4])
-
     for car in carList:
-        #OfferId = car.find('a', {'name': 'data-ad-id'}).get('value')
-
         # TODO: test regex performance
-        #print(type(car))
-        #print(car)
-        #OfferId = car.find_all(re.compile("data-ad-id=\"(.*?)\""))
-        #OfferId = re.search("(data-ad-id=)\"(.*?)\"", car)[0]
+            #OfferId = car.find_all(re.compile("data-ad-id=\"(.*?)\""))
+            #OfferId = re.search("(data-ad-id=)\"(.*?)\"", car)[0]
 
         offer_id = car.find("a")['data-ad-id']
         city = car.find('span',class_='ds-location-city').text.strip()
@@ -50,10 +38,10 @@ def parse_html2csv(html_file : str): # PARSE HTML TO CSV
         model = car.find('a',class_='offer-title__link').text.strip()
 
         #params = car.find("li", class_='ds-param')
-
         year = car.find("li", {"data-code" : "year"}).text.strip()
         mileage = car.find("li", {"data-code" : "mileage"}).text[:-3].replace(" ", "").strip()
 
+        # Performance check required:
         # try:
         #     displacement = car.find("li", {"data-code" : "engine_capacity"}).text[:-3].replace(" ", "")
         # except AttributeError:
@@ -69,77 +57,72 @@ def parse_html2csv(html_file : str): # PARSE HTML TO CSV
 
         fuel_type = car.find("li", {"data-code" : "fuel_type"}).text.strip()
 
-        price_currency = car.find('span',class_='offer-price__number').text.replace(" ", "")
-        price = price_currency.splitlines()[1]
-        #currency = price[len(price)-4:].strip()
-        currency = str(price_currency.splitlines()[2])
+        car_value = car.find('span',class_='offer-price__number').text.replace(" ", "")
+        price = car_value.splitlines()[1]
+        currency = str(car_value.splitlines()[2]) #currency = price[len(price)-4:].strip()
 
         pub_date = html_file[8:18]
         duration = "1"
         end_price = "-1"
 
-        # print(offer_id + ',' +
-            #   city + ','+
-            #   region  + ','+
-            #   model + ','+
-            #   year.strip() + ','+
-            #   mileage.strip() + ','+
-            #   fuel_type.strip() + ','+
-            #   str(displacement) + ','+
-            #   price[:-4].strip() + ','+
-            #   currency.strip() + ','+
-            #   pub_date + ',' +
-            #   duration + ',' +
-            #   end_price
-            #   )
+        csv_rows = offer_id + ',' +\
+                    city + ','+\
+                    region  + ','+\
+                    model + ','+\
+                    year + ','+\
+                    mileage + ','+\
+                    fuel_type + ','+\
+                    displacement + ','+\
+                    price + ','+\
+                    currency + ','+\
+                    pub_date + ',' +\
+                    duration + ',' +\
+                    end_price+'\n'
 
-        carFile.write(offer_id + ',' +
-              city + ','+
-              region  + ','+
-              model + ','+
-              year + ','+
-              mileage + ','+
-              fuel_type + ','+
-              displacement + ','+
-              price + ','+
-              currency + ','+
-              pub_date + ',' +
-              duration + ',' +
-              end_price + '\n'
-              )
+        sql_row = """("{offer_id}",
+                        "{city}",
+                        "{region}",
+                        "{model}",
+                        "{year}",
+                        "{mileage}",
+                        "{fuel_type}",
+                        "{displacement}",
+                        "{price}",
+                        "{currency}",
+                        "{pub_date}",
+                        "{duration}",
+                        "{end_price}"),
+        """.format(offer_id=offer_id,
+                    city=city,
+                    region=region,
+                    model=model,
+                    year=year,
+                    mileage=mileage,
+                    fuel_type=fuel_type,
+                    displacement=displacement,
+                    price=price,
+                    currency=currency,
+                    pub_date=pub_date,
+                    duration=duration,
+                    end_price=end_price)
 
-        sql_rows = """("{offer_id}","{city}","{region}","{model}","{year}","{mileage}","{fuel_type}","{displacement}","{price}","{currency}","{pub_date}","{duration}","{end_price}"),
-        """.format(offer_id=offer_id,city=city,region=region,model=model,year=year,mileage=mileage,fuel_type=fuel_type,displacement=displacement,price=price,currency=currency,pub_date=pub_date,duration=duration,end_price=end_price)
-        #print(sql_rows)
+        sql_list.append(sql_row)
+        csv_list.append(csv_rows)
 
-        l.append(sql_rows)
-
-        #print(l)
-
-        sql_query = """
-                    INSERT INTO
-                    cars (offer_id,city,region,model,year,mileage,fuel_type,displacement,price,currency,pub_date,duration,end_price)
-                    VALUES
-                    ("{offer_id}","{city}","{region}","{model}","{year}","{mileage}","{fuel_type}","{displacement}","{price}","{currency}","{pub_date}","{duration}","{end_price}");
-        """.format(offer_id=offer_id,city=city,region=region,model=model,year=year,mileage=mileage,fuel_type=fuel_type,displacement=displacement,price=price,currency=currency,pub_date=pub_date,duration=duration,end_price=end_price)
-
-
-    tuple(l)
-
-    sqlstement = '(' + ''.join(l) + ')'.strip()
-    last_char_index = sqlstement.rfind(",")
-    sqlstement1 = sqlstement[:last_char_index]+';'
-    #print(sqlstement)
-    #print(type(sqlstement))
-
-    execute_query(conn, sqlstement1[1:].strip())
-
-    #textfile = open('textfile.txt', 'w', encoding='utf-8')
-    #textfile.write(sqlstement1[1:].strip())
-    #textfile.close()
-
+    # export to csv at once
+    carFile = io.open(fname, 'w', encoding="utf-8")
+    csv_content = ''.join(csv_list).strip()
+    carFile.write(csv_content)
     carFile.close()
 
+    # export to SQLite in one query
+    conn = create_connection('pythonsqlite.db')
+    create_table(conn, fname[:-4])
+    query_content = '(' + ''.join(sql_list) + ')'.strip()
+    last_char_index = query_content.rfind(",")
+    sql_content = query_content[:last_char_index]+';'
+
+    execute_query(conn, sql_content[1:].strip())
 
 def merge_csv(csv_file : str):
 # merge two csv files form consecutive days  into one my_df file
@@ -192,7 +175,7 @@ def fill_csv(csv_file : str):
 def clean(file: str):
     destination = './archive/'
     #shutil.move(file, destination+file)
-    os.remove(file[:-4]+'csv')
+    #os.remove(file[:-4]+'csv')
 
 #--------------------------------------------------#
 
@@ -218,8 +201,6 @@ else:
         fill_csv(csv_file)
         clean(f)
         print(f+' - done')
-
-
 
 end = timer()
 print(end - start)
