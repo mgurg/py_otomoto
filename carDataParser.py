@@ -20,7 +20,7 @@ def parse_html2csv(html_file : str): # PARSE HTML TO CSV
             INSERT INTO
             "{table_name}" (offer_id,city,region,model,year,mileage,fuel_type,displacement,price,currency,pub_date,duration,end_price)
             VALUES
-        """.format(table_name= fname[:-4])
+        """.format(table_name= fname[:-4].replace("-", ""))
 
     sql_list=[sql_header]
 
@@ -174,8 +174,8 @@ def fill_csv(csv_file : str):
 
 def clean(file: str):
     destination = './archive/'
-    shutil.move(file, destination+file)
-    #os.remove(file[:-4]+'csv')
+    #shutil.move(file, destination+file)
+    os.remove(file[:-4]+'csv')
 
 #--------------------------------------------------#
 

@@ -9,6 +9,8 @@
 *.png
 *.sh
 *.db
+*.db-journal
+*.txt
 # *.ipynb
 
 # ignore folders

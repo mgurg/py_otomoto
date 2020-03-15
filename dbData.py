@@ -18,7 +18,7 @@ def create_table(conn, table_name, create_table_sql=' '):
     :return:
     """
     create_table_sql = """CREATE TABLE "{table_name}" (
-	"offer_id"	INTEGER NOT NULL,
+	"offer_id"	INTEGER NOT NULL PRIMARY KEY,
 	"city"	TEXT,
 	"region"	TEXT,
 	"model"	TEXT,
@@ -92,4 +92,6 @@ def merge_tables():
 #execute_query(conn, create_users)
 merge_tables()
 
+
+# https://stackoverflow.com/questions/14303573/join-two-different-tables-and-remove-duplicated-entries
 
