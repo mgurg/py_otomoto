@@ -6,7 +6,7 @@ import re
 import os
 import pandas as pd
 import shutil
-from dbData import create_connection,create_table,execute_query
+from dbData import create_connection,create_table,execute_query,get_tables_list
 
 start = timer()
 
@@ -52,7 +52,7 @@ def parse_html2csv(html_file : str): # PARSE HTML TO CSV
         if displacement is not None:
             displacement = displacement.get_text()[:-4].replace(" ", "").strip()
         else:
-            print(offer_id + ' no displacement value')
+            # print(offer_id + ' no displacement value')
             displacement = str(-1)
 
         fuel_type = car.find("li", {"data-code" : "fuel_type"}).text.strip()
@@ -117,7 +117,7 @@ def parse_html2csv(html_file : str): # PARSE HTML TO CSV
 
     # export to SQLite in one query
     conn = create_connection('pythonsqlite.db')
-    create_table(conn, fname[:-4])
+    create_table(conn, fname[:-4].replace("-", ""))
     query_content = '(' + ''.join(sql_list) + ')'.strip()
     last_char_index = query_content.rfind(",")
     sql_content = query_content[:last_char_index]+';'
@@ -174,7 +174,7 @@ def fill_csv(csv_file : str):
 
 def clean(file: str):
     destination = './archive/'
-    #shutil.move(file, destination+file)
+    shutil.move(file, destination+file)
     #os.remove(file[:-4]+'csv')
 
 #--------------------------------------------------#
@@ -194,7 +194,6 @@ if not files:
 else:
     for f in files:
         print('....')
-        #os.remove('my_df.csv')
         csv_file = f[:-4]+'csv'
         parse_html2csv(f)
         merge_csv(csv_file)

@@ -1,4 +1,5 @@
 import sqlite3
+import pandas as pd
 from sqlite3 import Error
 
 def create_connection(path):
@@ -62,8 +63,33 @@ create_users = '''
     (6069421596,'Katowice','Śląskie','Toyota Yaris II',2008,214548,'Benzyna+LPG',1298,12000,'PLN','2019-12-31',31,12000),
     (6068568066,'Katowice','Śląskie','Toyota Yaris II',2007,38000,'Benzyna',1298,19300,'PLN','2019-12-31',12,18500);
     '''
+def get_tables_list():
+    db = sqlite3.connect('pythonsqlite.db')
+    table = pd.read_sql_query("SELECT name FROM sqlite_master WHERE type='table';", db)
+
+    pdToList = list(table['name'])
+    # print(table['name'])
+    #print(pdToList)
+    return pdToList
+
+def merge_tables():
+    #tables = get_tables_list()
+    conn = create_connection('pythonsqlite.db')
+    table = pd.read_sql_query("SELECT name FROM sqlite_master WHERE type='table';", conn)
+    pdToList = list(table['name'])
+
+
+    for f in pdToList:
+        if f != "mtable":
+            print(f)
+            execute_query(conn, """INSERT INTO mtable SELECT * FROM otomoto_2020-02-26;""")
+            print (f +  ': done')
+
 
 
 #conn = create_connection(database)
 #create_table(conn, sql_create_table)
 #execute_query(conn, create_users)
+merge_tables()
+
+
