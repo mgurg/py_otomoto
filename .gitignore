@@ -16,6 +16,7 @@ data
 .vscode
 .ipynb_checkpoints
 archive
+old
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
