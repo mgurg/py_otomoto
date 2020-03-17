@@ -27,11 +27,13 @@ class OtomotoSpider(scrapy.Spider):
         #print(lastPage)
 
         offers = response.xpath("//div[@class='offers list']").extract() # extract offer list
-        print(type(offers))
-		
+        #print(type(offers))
 
         data = json.loads(response.xpath('//script[@type="application/ld+json"]//text()').extract_first()) # extract of ld+json from page
         #print(type(data))
+
+        offer_url =  response.css('article').xpath('@data-href').getall()
+        print(offer_url)
 
         current_page = response.meta.get("page", 1)
         next_page = current_page + 1
@@ -68,6 +70,11 @@ class OtomotoSpider(scrapy.Spider):
             # this would place the entire output on one line
             # use json.dump(lista_items, f, indent=4) to "pretty-print" with four spaces per indent
             json.dump(data, j, indent=4)
+
+        with open('./otomoto_'+now.strftime('%Y%m%d')+'.txt', 'a',encoding='utf-8') as u:
+            for item in offer_url:
+				# remove double spaces to shrink file size
+                u.write("%s\n" % item)
 
     # def parse_item(self, response):
 	#       with open('page.html', 'wb') as html_file:
