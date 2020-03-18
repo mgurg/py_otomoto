@@ -19,6 +19,7 @@ data
 .ipynb_checkpoints
 archive
 old
+scrapy
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
