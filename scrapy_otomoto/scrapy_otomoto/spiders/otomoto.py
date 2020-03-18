@@ -2,6 +2,7 @@
 import scrapy
 import json
 import datetime
+import re
 
 # https://www.scrapingbee.com/blog/web-scraping-with-scrapy/
 # https://towardsdatascience.com/scrape-multiple-pages-with-scrapy-ea8edfa4318
@@ -33,7 +34,7 @@ class OtomotoSpider(scrapy.Spider):
         #print(type(data))
 
         offer_url =  response.css('article').xpath('@data-href').getall()
-        print(offer_url)
+        #print(offer_url)
 
         current_page = response.meta.get("page", 1)
         next_page = current_page + 1
@@ -53,7 +54,6 @@ class OtomotoSpider(scrapy.Spider):
 
         if isTruncated == False:
             print(lastPage)
-
 
         # with open('page'+str(current_page)+'.html', 'wb') as html_file:
         #     html_file.write(response.body)
@@ -76,7 +76,16 @@ class OtomotoSpider(scrapy.Spider):
 				# remove double spaces to shrink file size
                 u.write("%s\n" % item)
 
-    # def parse_item(self, response):
-	#       with open('page.html', 'wb') as html_file:
-	# 	        html_file.write(response.body)
-    #     #pass
+        for item in offer_url:
+            #url = urljoin(response.url, p)
+            url=item
+            yield scrapy.Request(url, callback=self.parse_item)
+
+    def parse_item(self, response):
+        item = response.url
+        file_name =  response.url[-13:]
+        print('URL_MGU:'+ file_name)
+        with open(file_name, 'wb') as html_file:
+            html_file.write(response.body)
+        #with open(file_name, 'a',encoding='utf-8') as html_file:
+        #    html_file.write(response.text)
