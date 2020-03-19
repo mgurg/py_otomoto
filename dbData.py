@@ -95,3 +95,51 @@ merge_tables()
 
 # https://stackoverflow.com/questions/14303573/join-two-different-tables-and-remove-duplicated-entries
 
+# CREATE TABLE car_XXXXXXXXX (
+# 	"offer_id"	INTEGER NOT NULL PRIMARY KEY,
+# 	"user_id"	INTEGER,
+# 	"UID" TEXT,
+# 	"private_business"	TEXT,
+# 	"city"	TEXT,
+# 	"region"	TEXT,
+# 	"make"	TEXT,
+# 	"model"	TEXT,
+# 	"year"	INTEGER,
+# 	"mileage"	INTEGER,
+# 	"engine_code" TEXT,
+# 	"displacement"	INTEGER,
+# 	"vin" TEXT,
+# 	"fuel_type"	TEXT,
+# 	"engine_power" INTEGER,
+# 	"gearbox" TEXT,
+# 	"transmission" TEXT,
+# 	"body_type" TEXT
+# 	"door_count" INTEGER,
+# 	"nr_seats" INTEGER
+# 	"colour" TEXT,
+# 	"features" TEXT,
+# 	"price_raw"	INTEGER,
+# 	"currency"	TEXT,
+# 	"country_origin"	TEXT,
+# 	"registration" TEXT,
+# 	"pub_date"	TEXT,
+# 	"duration"	INTEGER,
+# 	"end_price"	INTEGER
+#     );
+
+
+# CREATE TABLE otomoto_DATE (
+# 	"offer_id"	INTEGER NOT NULL PRIMARY KEY,
+# 	"city"	TEXT,
+# 	"region"	TEXT,
+# 	"model"	TEXT,
+# 	"year"	INTEGER,
+# 	"mileage"	INTEGER,
+# 	"fuel_type"	TEXT,
+# 	"displacement"	INTEGER,
+# 	"price"	INTEGER,
+# 	"currency"	TEXT,
+# 	"pub_date"	TEXT,
+# 	"duration"	INTEGER,
+# 	"end_price"	INTEGER
+#     );

@@ -66,7 +66,8 @@ class OtomotoSpider(scrapy.Spider):
     def parse_item(self, response):
         pattern = re.compile(r"""(GPT.targeting = )(.*?);""")
         result = re.search(pattern, response.text)
-        file_name =  'car_json'#response.url[-13:]
+
+        file_name =  response.url[-13:]
         with open(file_name, "a") as text_file:
             text_file.write(result.group(2))
             # ID6CDXN8
