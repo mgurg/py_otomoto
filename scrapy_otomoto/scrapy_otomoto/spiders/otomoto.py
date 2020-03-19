@@ -4,13 +4,6 @@ import json
 import datetime
 import re
 
-# https://www.scrapingbee.com/blog/web-scraping-with-scrapy/
-# https://towardsdatascience.com/scrape-multiple-pages-with-scrapy-ea8edfa4318
-
-# TODO: PAgination
-# https://stackoverflow.com/questions/54716360/incremental-pagination-in-scrapy-python
-# https://towardsdatascience.com/scrape-multiple-pages-with-scrapy-ea8edfa4318
-
 class OtomotoSpider(scrapy.Spider):
     name = 'otomoto'
 
@@ -28,13 +21,8 @@ class OtomotoSpider(scrapy.Spider):
         #print(lastPage)
 
         offers = response.xpath("//div[@class='offers list']").extract() # extract offer list
-        #print(type(offers))
-
         data = json.loads(response.xpath('//script[@type="application/ld+json"]//text()').extract_first()) # extract of ld+json from page
-        #print(type(data))
-
         offer_url =  response.css('article').xpath('@data-href').getall()
-        #print(offer_url)
 
         current_page = response.meta.get("page", 1)
         next_page = current_page + 1
@@ -55,10 +43,6 @@ class OtomotoSpider(scrapy.Spider):
         if isTruncated == False:
             print(lastPage)
 
-        # with open('page'+str(current_page)+'.html', 'wb') as html_file:
-        #     html_file.write(response.body)
-        #print("procesing:"+response.url)
-
         now = datetime.datetime.now()
 
         with open('./otomoto_'+now.strftime('%Y%m%d')+'.html', 'a',encoding='utf-8') as f:
@@ -72,20 +56,20 @@ class OtomotoSpider(scrapy.Spider):
             json.dump(data, j, indent=4)
 
         with open('./otomoto_'+now.strftime('%Y%m%d')+'.txt', 'a',encoding='utf-8') as u:
-            for item in offer_url:
-				# remove double spaces to shrink file size
+            for url in offer_url:
                 u.write("%s\n" % item)
 
-        for item in offer_url:
-            #url = urljoin(response.url, p)
-            url=item
+        for url in offer_url:
             yield scrapy.Request(url, callback=self.parse_item)
 
+    # parse car subpages
     def parse_item(self, response):
-        item = response.url
-        file_name =  response.url[-13:]
-        print('URL_MGU:'+ file_name)
-        with open(file_name, 'wb') as html_file:
-            html_file.write(response.body)
-        #with open(file_name, 'a',encoding='utf-8') as html_file:
-        #    html_file.write(response.text)
+        pattern = re.compile(r"""(GPT.targeting = )(.*?);""")
+        result = re.search(pattern, response.text)
+        file_name =  'car_json'#response.url[-13:]
+        with open(file_name, "a") as text_file:
+            text_file.write(result.group(2))
+            # ID6CDXN8
+            # ID6CQOCT
+            # ID6CRr7q
+            # ID6CTQ4D
