@@ -29,3 +29,36 @@ print(car_json['features'])
 end = timer()
 print('Time: '+ str(end - tstart))
 
+
+import json 
+import pandas as pd 
+from pandas.io.json import json_normalize 
+
+# https://medium.com/@amirziai/flatten-json-on-python-package-index-pypi-9e4951693a5a
+
+# def flatten_json(y):
+#     out = {}
+
+#     def flatten(x, name=''):
+#         if type(x) is dict:
+#             for a in x:
+#                 flatten(x[a], name + a + '_')
+#         elif type(x) is list:
+#             i = 0
+#             for a in x:
+#                 flatten(a, name + str(i) + '_')
+#                 i += 1
+#         else:
+#             out[name[:-1]] = x
+
+#     flatten(y)
+#     return out
+
+# with open('y.json') as f: 
+#     d = json.load(f) 
+    
+# flat = flatten_json(d)    
+    
+    
+# yaris = json_normalize(flat) 
+# yaris.head(3) 
