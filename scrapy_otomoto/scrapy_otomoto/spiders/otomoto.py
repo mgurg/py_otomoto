@@ -64,10 +64,18 @@ class OtomotoSpider(scrapy.Spider):
 
     # parse car subpages
     def parse_item(self, response):
+
+        #regex - 0.0034
         pattern = re.compile(r"""(GPT.targeting = )(.*?);""")
         result = re.search(pattern, response.text)
 
-        file_name =  response.url[-13:]
+        # # python - 0.026
+        # start = data.find('GPT.targeting = ')+len('GPT.targeting = ')
+        # stop = data.find(';', start)
+        # json_data = data[start:stop]
+        # car_json = json.loads(json_data)
+
+        file_name =  response.url[-13:] # ID6CDXN8.html
         with open(file_name, "a") as text_file:
             text_file.write(result.group(2))
             # ID6CDXN8

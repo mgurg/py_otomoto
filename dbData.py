@@ -17,21 +17,55 @@ def create_table(conn, table_name, create_table_sql=' '):
     :param create_table_sql: a CREATE TABLE statement
     :return:
     """
-    create_table_sql = """CREATE TABLE "{table_name}" (
-	"offer_id"	INTEGER NOT NULL PRIMARY KEY,
-	"city"	TEXT,
-	"region"	TEXT,
-	"model"	TEXT,
-	"year"	INTEGER,
-	"mileage"	INTEGER,
-	"fuel_type"	TEXT,
-	"displacement"	INTEGER,
-	"price"	INTEGER,
-	"currency"	TEXT,
-	"pub_date"	TEXT,
-	"duration"	INTEGER,
-	"end_price"	INTEGER
-    );""".format(table_name=table_name)
+    # master_table
+    # create_table_sql = """CREATE TABLE "{table_name}" (
+	# "offer_id"	INTEGER NOT NULL PRIMARY KEY,
+	# "city"	TEXT,
+	# "region"	TEXT,
+	# "model"	TEXT,
+	# "year"	INTEGER,
+	# "mileage"	INTEGER,
+	# "fuel_type"	TEXT,
+	# "displacement"	INTEGER,
+	# "price"	INTEGER,
+	# "currency"	TEXT,
+	# "pub_date"	TEXT,
+	# "duration"	INTEGER,
+	# "end_price"	INTEGER
+    # );""".format(table_name=table_name)
+
+    # car_table
+    # car_table_sql ="""CREATE TABLE "{table_name}" (
+	# "offer_id"	INTEGER NOT NULL PRIMARY KEY,
+	# "user_id"	INTEGER,
+	# "UID" TEXT,
+	# "private_business"	TEXT,
+	# "city"	TEXT,
+	# "region"	TEXT,
+	# "make"	TEXT,
+	# "model"	TEXT,
+	# "year"	INTEGER,
+	# "mileage"	INTEGER,
+	# "engine_code" TEXT,
+	# "displacement"	INTEGER,
+	# "vin" TEXT,
+	# "fuel_type"	TEXT,
+	# "engine_power" INTEGER,
+	# "gearbox" TEXT,
+	# "transmission" TEXT,
+	# "body_type" TEXT
+	# "door_count" INTEGER,
+	# "nr_seats" INTEGER
+	# "colour" TEXT,
+	# "features" TEXT,
+	# "price_raw"	INTEGER,
+	# "currency"	TEXT,
+	# "country_origin"	TEXT,
+	# "registration" TEXT,
+	# "pub_date"	TEXT,
+	# "duration"	INTEGER,
+	# "end_price"	INTEGER
+    # );""".format(table_name=table_name)
 
     try:
         c = conn.cursor()
@@ -59,9 +93,6 @@ create_users = '''
     VALUES
     (6069449316,'Prudnik','Opolskie','Toyota Yaris II',2009,153000,'Diesel',-1,12999,'PLN','2019-12-31',7,12999),
     (6068202189,'Włocławek','Kujawsko-pomorskie','Toyota Yaris II',2008,110000,'Benzyna',1298,17600,'PLN','2019-12-31',21,16900),
-    (6067206317,'Łódź','Łódzkie','Toyota Yaris II',2010,167938,'Diesel',1364,13999,'PLN','2019-12-31',31,13900),
-    (6069421596,'Katowice','Śląskie','Toyota Yaris II',2008,214548,'Benzyna+LPG',1298,12000,'PLN','2019-12-31',31,12000),
-    (6068568066,'Katowice','Śląskie','Toyota Yaris II',2007,38000,'Benzyna',1298,19300,'PLN','2019-12-31',12,18500);
     '''
 def get_tables_list():
     db = sqlite3.connect('pythonsqlite.db')
@@ -90,7 +121,7 @@ def merge_tables():
 #conn = create_connection(database)
 #create_table(conn, sql_create_table)
 #execute_query(conn, create_users)
-merge_tables()
+#merge_tables()
 
 
 # https://stackoverflow.com/questions/14303573/join-two-different-tables-and-remove-duplicated-entries
