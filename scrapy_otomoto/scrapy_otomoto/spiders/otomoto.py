@@ -2,7 +2,10 @@
 import scrapy
 import json
 import datetime
+import time
 import re
+import sys
+import pathlib
 
 class OtomotoSpider(scrapy.Spider):
     name = 'otomoto'
@@ -15,10 +18,20 @@ class OtomotoSpider(scrapy.Spider):
     start_urls = ['https://www.otomoto.pl/osobowe/toyota/yaris/ii-2005-2011/']
 
     def parse(self, response):
+
+        f_car_list = "db_car_list.txt"
+        lines = []
+        if pathlib.Path(f_car_list).exists ():
+            with open(f_car_list, encoding="utf-8") as file:
+                for line in file:
+                    line = line.strip()
+                    lines.append(line)
+        else:
+            pass
+
         print(response.status)
 
         lastPage =  response.xpath("//span[@class='page']//text()").extract()[-1]# extract offer list
-        #print(lastPage)
 
         offers = response.xpath("//div[@class='offers list']").extract() # extract offer list
         data = json.loads(response.xpath('//script[@type="application/ld+json"]//text()').extract_first()) # extract of ld+json from page
@@ -56,11 +69,16 @@ class OtomotoSpider(scrapy.Spider):
             json.dump(data, j, indent=4)
 
         with open('./otomoto_'+now.strftime('%Y%m%d')+'.txt', 'a',encoding='utf-8') as u:
-            for url in offer_url:
-                u.write("%s\n" % item)
+            for url_item in offer_url:
+                u.write("%s\n" % url_item)
+
 
         for url in offer_url:
-            yield scrapy.Request(url, callback=self.parse_item)
+            if url[-13:-5] in lines:
+                print(url[-13:-5]+' already present')
+            else:
+                print(url[-13:-5]+' not present yet')
+                yield scrapy.Request(url, callback=self.parse_item)
 
     # parse car subpages
     def parse_item(self, response):
@@ -80,5 +98,8 @@ class OtomotoSpider(scrapy.Spider):
             text_file.write(result.group(2))
             # ID6CDXN8
             # ID6CQOCT
-            # ID6CRr7q
-            # ID6CTQ4D
+
+    # def parse_list(self):
+    #     with open('./otomoto_'+now.strftime('%Y%m%d')+'.txt', "rt", ,encoding='utf-8') as f:
+    #         start_urls = [url.strip() for url in f.readlines()]
+    #     print(start_urls)

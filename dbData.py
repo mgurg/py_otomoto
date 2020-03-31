@@ -11,7 +11,7 @@ def create_connection(path):
         print(f"The error '{e}' occurred")
     return connection
 
-def create_table(conn, table_name, create_table_sql=' '):
+def create_table(conn, table_name, create_table_sql):
     """ create a table from the create_table_sql statement
     :param conn: Connection object
     :param create_table_sql: a CREATE TABLE statement

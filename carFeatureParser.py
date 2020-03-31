@@ -5,13 +5,12 @@ import json
 import re
 from dbData import create_connection,create_table,execute_query
 from timeit import default_timer as timer
-
-import pandas as pd
-from pandas.io.json import json_normalize
+from datetime import datetime
+import sys
 
 tstart = timer()
 
-def get_current_car_list():
+def get_db_car_list():
     # list all unique cars in database
     car_list = []
     conn = create_connection('pythonsqlite.db')
@@ -21,18 +20,22 @@ def get_current_car_list():
         item = ''.join(y)
         if item[0] == 'c': # ('car_ID6CXnaK',)
             car_list.append(item[4:])
+
+    with open('.\scrapy_otomoto\scrapy_otomoto\spiders\db_car_list.txt', 'w', encoding="utf-8") as f:
+        for item in car_list:
+            f.write("%s\n" % item)
+
     return car_list
 
 def get_file_list():
     # list all unique cars data in files
-    files_list = []
-
     for file in os.listdir("./archive/cars/"):
         if file.endswith(".html"):
             #files.append(file) # just filename
             files.append(os.path.join("./archive/cars/", file)) # file with path
             #print(os.path.join("./", file))
-    return files_list
+
+    return files
 
 def compare_lists(a,b):
     #compare items in DB to file list
@@ -81,18 +84,19 @@ def parse_json2sql(fname):
     currency = parse_json_key(data,'currency')
     country_origin= parse_json_key(data,'country_origin')
     registration= parse_json_key(data,'registration')
+    date = datetime.today().strftime('%Y-%m-%d') #format: "2020-03-32"
 
     return [offer_id,user_id,UID, private_business,region, subregion, city, make, model, year, mileage,
     engine_code, engine_capacity, vin, fuel_type, engine_power, gearbox, transmission, body_type,
-    door_count,nr_seats, color, features, price_raw, currency, country_origin,registration]
+    door_count,nr_seats, color, features, price_raw, currency, country_origin,registration, date]
 
 def store_car_sql(fname):
     table_name = 'car_'+fname[-13:-5]
 
     car_table_sql ="""CREATE TABLE "{table_name}" (
-	"offer_id"	INTEGER NOT NULL PRIMARY KEY,
+	"offer_id"	INTEGER NOT NULL,
 	"user_id"	INTEGER,
-	"UID" TEXT,
+	"uid" TEXT,
 	"private_business"	TEXT,
     "region"	TEXT,
     "subregion"	TEXT,
@@ -116,77 +120,33 @@ def store_car_sql(fname):
 	"price_raw"	INTEGER,
 	"currency"	TEXT,
 	"country_origin"	TEXT,
-	"registration" TEXT
+	"registration" TEXT,
+    "date" TEXT
     );""".format(table_name=table_name)
 
     insert_sql = """INSERT INTO "{table_name}"
                     VALUES """.format(table_name=table_name) + '(' + str(parse_json2sql(fname))[1:-1]+')'
 
     #print('(' + str(parse_json2sql(fname))[1:-1]+')')
-    print(insert_sql)
-    #conn = create_connection('pythonsqlite.db')
-    #create_table(conn, table_name, car_table_sql)
-    #execute_query(conn,insert_sql)
+    #print(insert_sql)
+    conn = create_connection('pythonsqlite.db')
+    create_table(conn, table_name, car_table_sql)
+    execute_query(conn,insert_sql)
     #execute_query(conn, "DROP TABLE {table_name};".format(table_name=table_name))
 
+#----------------------------------------------------------------------------------------------------------------------
+
 files = []
+files = get_file_list()
 
-for file in os.listdir("./archive/cars/"):
-    if file.endswith(".html"):
-        files.append(file[:-5]) # just filename
-        #files.append(os.path.join("./archive/cars/", file)) # file with path
-        #print(os.path.join("./", file))
-
-parsing_list = compare_lists(files, get_current_car_list())
-print(parsing_list)
-
-if not parsing_list:
-  print("Nothing here")
+if not files:
+  print("No offers to process")
 else:
-    i = 0
-    for fname in parsing_list:
-        i=i+1
-        #print(str(i)+' : '+ fname)
-        #parse_json2sql(fname)
-        #store_car_sql(fname)
+    for fname in files:
+        store_car_sql(fname)
 
+get_db_car_list()
 
-# with open('./otomoto_20200320.html', 'r', encoding="utf-8") as myfile:
-#   data = myfile.read()
-
-# #regex - 0.0034
-# # pattern = re.compile(r"""(GPT.targeting = )(.*?);""")
-# # result = re.search(pattern, data)
-# # car_json = json.loads(result.group(2))
-
-
-# # python - 0.026
-# start = data.find('GPT.targeting = ')+len('GPT.targeting = ')
-# stop = data.find(';', start)
-# json_data = data[start:stop]
-# car_json = json.loads(json_data)
-
-
-# print(car_json)
-# print(car_json['features'])
 
 end = timer()
 print('Time: '+ str(end - tstart))
-
-# https://medium.com/@amirziai/flatten-json-on-python-package-index-pypi-9e4951693a5a
-# features_list = ["abs" , "cd" , "central-lock" , "front-electric-windows" ,
-# "electronic-rearview-mirrors" , "electronic-immobiliser" , "front-airbags" ,
-# "front-passenger-airbags" , "original-radio" , "assisted-steering" , "alarm" ,
-# "alloy-wheels" , "asr" , "park-assist" , "lane-assist" , "bluetooth" , "automatic-wipers" ,
-# "blind-spot-sensor" , "automatic-lights" , "both-parking-sensors" , "rear-parking-sensors" ,
-# "panoramic-sunroof" , "electric-exterior-mirror" , "electric-interior-mirror" ,
-# "rear-electric-windows" , # "electric-adjustable-seats" , "esp" , "aux-in" , "sd-socket" ,
-# "usb-socket" , "towing-hook" , # "head-display" , "isofix" , "rearview-camera" ,
-# "automatic-air-conditioning" , "quad-air-conditioning" , # "dual-air-conditioning" ,
-# "air-conditioning" , "onboard-computer" , "side-window-airbags" , "shift-paddles" ,
-# "mp3" , "gps" , "dvd" , "speed-limiter" , "auxiliary-heating" , "heated-windshield" ,
-# "heated-rearview-mirrors" , # "front-heated-seats" , "rear-heated-seats" , "driver-knee-airbag" ,
-# "front-side-airbags" , "rear-passenger-airbags" , # "tinted-windows" , "radio" , "adjustable-suspension" ,
-# "roof-bars" , "system-start-stop" , "sunroof" , "daytime-lights" , # "leds" , "fog-lights" , "xenon-lights" ,
-# "leather-interior" , "velour-interior" , "cruise-control" , "active-cruise-control" , # "tv" ,
-# "steering-whell-comands" , "cd-changer"]

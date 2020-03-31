@@ -18,9 +18,9 @@ def parse_html2csv(html_file : str): # PARSE HTML TO CSV
 
     sql_header = """
             INSERT INTO
-            "{table_name}" (offer_id,city,region,model,year,mileage,fuel_type,displacement,price,currency,pub_date,duration,end_price)
+            "{table_name}" (offer_id, uid, url, city,type,year,mileage,price,currency)
             VALUES
-        """.format(table_name= fname[:-4].replace("-", ""))
+        """.format(table_name= fname[:-6].replace("-", ""))
 
     sql_list=[sql_header]
 
@@ -40,6 +40,11 @@ def parse_html2csv(html_file : str): # PARSE HTML TO CSV
         #params = car.find("li", class_='ds-param')
         year = car.find("li", {"data-code" : "year"}).text.strip()
         mileage = car.find("li", {"data-code" : "mileage"}).text[:-3].replace(" ", "").strip()
+
+
+        url = car.find("a")['href'].split("#")[0]
+        uid = url[-13:-5]
+        #print(uid)
 
         # Performance check required:
         # try:
@@ -61,7 +66,9 @@ def parse_html2csv(html_file : str): # PARSE HTML TO CSV
         price = car_value.splitlines()[1]
         currency = str(car_value.splitlines()[2]) #currency = price[len(price)-4:].strip()
 
-        pub_date = html_file[8:18]
+        print(html_file)
+        pub_date = html_file[8:16]
+        print(pub_date)
         duration = "1"
         end_price = "-1"
 
@@ -80,31 +87,23 @@ def parse_html2csv(html_file : str): # PARSE HTML TO CSV
                     end_price+'\n'
 
         sql_row = """("{offer_id}",
+                        "{uid}",
+                        "{url}",
                         "{city}",
-                        "{region}",
-                        "{model}",
+                        "{type}",
                         "{year}",
                         "{mileage}",
-                        "{fuel_type}",
-                        "{displacement}",
                         "{price}",
-                        "{currency}",
-                        "{pub_date}",
-                        "{duration}",
-                        "{end_price}"),
+                        "{currency}"),
         """.format(offer_id=offer_id,
+                    uid = uid,
+                    url = url,
                     city=city,
-                    region=region,
-                    model=model,
+                    type=model,
                     year=year,
                     mileage=mileage,
-                    fuel_type=fuel_type,
-                    displacement=displacement,
                     price=price,
-                    currency=currency,
-                    pub_date=pub_date,
-                    duration=duration,
-                    end_price=end_price)
+                    currency=currency)
 
         sql_list.append(sql_row)
         csv_list.append(csv_rows)
@@ -115,14 +114,30 @@ def parse_html2csv(html_file : str): # PARSE HTML TO CSV
     carFile.write(csv_content)
     carFile.close()
 
+    print(fname[:-6].replace("-", ""))
+    sql_str = """CREATE TABLE "{table_name}" (
+	    "offer_id"	INTEGER NOT NULL PRIMARY KEY,
+        "uid"   TEXT,
+        "url" TEXT,
+	    "city"	TEXT,
+	    "type"	TEXT,
+	    "year"	INTEGER,
+	    "mileage"	INTEGER,
+	    "price"	INTEGER,
+	    "currency"	TEXT
+        );""".format(table_name=fname[:-6].replace("-", ""))
+
     # export to SQLite in one query
     conn = create_connection('pythonsqlite.db')
-    create_table(conn, fname[:-4].replace("-", ""))
+    create_table(conn, fname[:-6].replace("-", ""), sql_str)
+
+    print('SQL1')
+
     query_content = '(' + ''.join(sql_list) + ')'.strip()
     last_char_index = query_content.rfind(",")
     sql_content = query_content[:last_char_index]+';'
 
-    execute_query(conn, sql_content[1:].strip())
+    #execute_query(conn, sql_content[1:].strip())
 
 def merge_csv(csv_file : str):
 # merge two csv files form consecutive days  into one my_df file
@@ -196,9 +211,9 @@ else:
         print('....')
         csv_file = f[:-4]+'csv'
         parse_html2csv(f)
-        merge_csv(csv_file)
-        fill_csv(csv_file)
-        clean(f)
+        #merge_csv(csv_file)
+        #fill_csv(csv_file)
+        #clean(f)
         print(f+' - done')
 
 end = timer()

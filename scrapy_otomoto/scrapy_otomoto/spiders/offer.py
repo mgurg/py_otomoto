@@ -10,7 +10,7 @@ import datetime
 # https://stackoverflow.com/questions/54716360/incremental-pagination-in-scrapy-python
 # https://towardsdatascience.com/scrape-multiple-pages-with-scrapy-ea8edfa4318
 
-class OtomotoSpider(scrapy.Spider):
+class Otomoto_offer_Spider(scrapy.Spider):
     name = 'otomoto'
 
     custom_settings = {
