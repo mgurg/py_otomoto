@@ -7,20 +7,15 @@ from dbData import create_connection,create_table,execute_query
 from timeit import default_timer as timer
 from datetime import datetime
 import sys
-
-tstart = timer()
+import shutil
 
 def get_db_car_list():
     # list all unique cars in database
     car_list = []
     conn = create_connection('pythonsqlite.db')
     c = conn.cursor()
-    x=c.execute("""SELECT name FROM sqlite_master where type='table'""")
-    for y in x.fetchall():
-        item = ''.join(y)
-        if item[0] == 'c': # ('car_ID6CXnaK',)
-            car_list.append(item[4:])
-
+    x=c.execute("""SELECT uid FROM otomoto_all""")
+    print(x)
     with open('.\scrapy_otomoto\scrapy_otomoto\spiders\db_car_list.txt', 'w', encoding="utf-8") as f:
         for item in car_list:
             f.write("%s\n" % item)
@@ -29,10 +24,10 @@ def get_db_car_list():
 
 def get_file_list():
     # list all unique cars data in files
-    for file in os.listdir("./archive/cars/"):
+    for file in os.listdir("./offers/cars/"):
         if file.endswith(".html"):
             #files.append(file) # just filename
-            files.append(os.path.join("./archive/cars/", file)) # file with path
+            files.append(os.path.join("./offers/cars/", file)) # file with path
             #print(os.path.join("./", file))
 
     return files
@@ -91,9 +86,9 @@ def parse_json2sql(fname):
     door_count,nr_seats, color, features, price_raw, currency, country_origin,registration, date]
 
 def store_car_sql(fname):
-    table_name = 'car_'+fname[-13:-5]
+    table_name = 'all_offers'
 
-    car_table_sql ="""CREATE TABLE "{table_name}" (
+    car_table_sql ="""CREATE TABLE IF NOT EXISTS "{table_name}" (
 	"offer_id"	INTEGER NOT NULL,
 	"user_id"	INTEGER,
 	"uid" TEXT,
@@ -117,14 +112,15 @@ def store_car_sql(fname):
 	"nr_seats" INTEGER,
 	"color" TEXT,
 	"features" TEXT,
-	"price_raw"	INTEGER,
+	"price_raw"	INTEGER NOT NULL,
 	"currency"	TEXT,
 	"country_origin"	TEXT,
 	"registration" TEXT,
-    "date" TEXT
+    "date" TEXT,
+    PRIMARY KEY (offer_id, price_raw)
     );""".format(table_name=table_name)
 
-    insert_sql = """INSERT INTO "{table_name}"
+    insert_sql = """INSERT OR IGNORE INTO "{table_name}"
                     VALUES """.format(table_name=table_name) + '(' + str(parse_json2sql(fname))[1:-1]+')'
 
     #print('(' + str(parse_json2sql(fname))[1:-1]+')')
@@ -134,19 +130,30 @@ def store_car_sql(fname):
     execute_query(conn,insert_sql)
     #execute_query(conn, "DROP TABLE {table_name};".format(table_name=table_name))
 
+def clean(file: str):
+    destination = './'+datetime.today().strftime('%Y-%m-%d')
+    shutil.move(file, destination+file)
+    os.remove(file)
+
 #----------------------------------------------------------------------------------------------------------------------
 
-files = []
-files = get_file_list()
 
-if not files:
-  print("No offers to process")
-else:
-    for fname in files:
-        store_car_sql(fname)
+if __name__ == "__main__":
+    tstart = timer()
 
-get_db_car_list()
+    files = []
+    files = get_file_list()
 
+    if not files:
+        print("No offers to process")
+    else:
+        for fname in files:
+            store_car_sql(fname)
+            #clean(fname)
+    end = timer()
+    print('Time: '+ str(end - tstart))
+#get_db_car_list()
 
-end = timer()
-print('Time: '+ str(end - tstart))
+# TODO:
+# - CLEAN-UP
+# - DB CAR LIST

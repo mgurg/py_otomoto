@@ -6,9 +6,10 @@ import re
 import os
 import pandas as pd
 import shutil
+from datetime import datetime
 from dbData import create_connection,create_table,execute_query,get_tables_list
 
-start = timer()
+
 
 def parse_html2csv(html_file : str): # PARSE HTML TO CSV
     fname = 'otomoto_'+ html_file[8:18] +'.csv'
@@ -18,7 +19,7 @@ def parse_html2csv(html_file : str): # PARSE HTML TO CSV
 
     sql_header = """
             INSERT INTO
-            "{table_name}" (offer_id, uid, url, city,type,year,mileage,price,currency)
+            "{table_name}" (offer_id, uid, url, city,type,year,mileage,price,currency,s_date,e_date)
             VALUES
         """.format(table_name= fname[:-6].replace("-", ""))
 
@@ -66,9 +67,9 @@ def parse_html2csv(html_file : str): # PARSE HTML TO CSV
         price = car_value.splitlines()[1]
         currency = str(car_value.splitlines()[2]) #currency = price[len(price)-4:].strip()
 
-        print(html_file)
+        #print(html_file)
         pub_date = html_file[8:16]
-        print(pub_date)
+        #print(pub_date)
         duration = "1"
         end_price = "-1"
 
@@ -94,7 +95,9 @@ def parse_html2csv(html_file : str): # PARSE HTML TO CSV
                         "{year}",
                         "{mileage}",
                         "{price}",
-                        "{currency}"),
+                        "{currency}",
+                        "{s_date}",
+                        "{e_date}"),
         """.format(offer_id=offer_id,
                     uid = uid,
                     url = url,
@@ -103,7 +106,10 @@ def parse_html2csv(html_file : str): # PARSE HTML TO CSV
                     year=year,
                     mileage=mileage,
                     price=price,
-                    currency=currency)
+                    currency=currency,
+                    s_date =datetime.today().strftime('%Y-%m-%d'),# "2020-04-17",
+                    e_date = datetime.today().strftime('%Y-%m-%d'),#"2020-04-17",
+                    )
 
         sql_list.append(sql_row)
         csv_list.append(csv_rows)
@@ -115,7 +121,7 @@ def parse_html2csv(html_file : str): # PARSE HTML TO CSV
     carFile.close()
 
     print(fname[:-6].replace("-", ""))
-    sql_str = """CREATE TABLE "{table_name}" (
+    sql_str = """CREATE TABLE IF NOT EXISTS "{table_name}" (
 	    "offer_id"	INTEGER NOT NULL PRIMARY KEY,
         "uid"   TEXT,
         "url" TEXT,
@@ -124,7 +130,9 @@ def parse_html2csv(html_file : str): # PARSE HTML TO CSV
 	    "year"	INTEGER,
 	    "mileage"	INTEGER,
 	    "price"	INTEGER,
-	    "currency"	TEXT
+	    "currency"	TEXT,
+        "s_date" TEXT,
+        "e_date" TEXT
         );""".format(table_name=fname[:-6].replace("-", ""))
 
     # export to SQLite in one query
@@ -137,7 +145,9 @@ def parse_html2csv(html_file : str): # PARSE HTML TO CSV
     last_char_index = query_content.rfind(",")
     sql_content = query_content[:last_char_index]+';'
 
-    #execute_query(conn, sql_content[1:].strip())
+    #print(sql_content)
+
+    execute_query(conn, sql_content[1:].strip())
 
 def merge_csv(csv_file : str):
 # merge two csv files form consecutive days  into one my_df file
@@ -186,6 +196,92 @@ def fill_csv(csv_file : str):
     #my_df['offer_id'] = my_df['offer_id'].astype('int64')
     my_df.to_csv (r'.\my_df.csv', index = None, header=True, encoding="utf-8")
 
+def merge_sql():
+    conn = create_connection('pythonsqlite.db')
+
+    table_id_sql = """
+    SELECT name
+    FROM sqlite_master
+    WHERE type = 'table' AND
+       name LIKE 'otomoto_2%'
+    ORDER BY name ASC;"""
+
+    c = conn.cursor()
+    c.execute(table_id_sql)
+    table_id = c.fetchall()
+    print(''.join(table_id[-1]))
+
+    temp_table = """--create temporary table
+    CREATE TABLE IF NOT EXISTS "temp_table" (
+	    "offer_id"	INTEGER NOT NULL,
+        "uid"   TEXT,
+		"year" INTEGER,
+		"mileage" INTEGER,
+		"price" INTEGER,
+        "s_date" TEXT,
+        "e_date" TEXT)"""
+
+    all_table = """--create temporary table
+    CREATE TABLE IF NOT EXISTS "otomoto_all" (
+	    "offer_id"	INTEGER NOT NULL,
+        "uid"   TEXT,
+		"year" INTEGER,
+		"mileage" INTEGER,
+		"price" INTEGER,
+        "s_date" TEXT,
+        "e_date" TEXT)"""
+
+    initial_transfer = """-- prepare otomoto_all
+    INSERT INTO otomoto_all(offer_id,uid,year,mileage,price,s_date,e_date)
+    SELECT offer_id,uid,year,mileage,price,s_date,e_date from "{table_name}";
+    """.format(table_name = ''.join(table_id[0])) #first table otomoto_2020mmdd
+
+    merge_data = """-- copy data
+    INSERT INTO temp_table(offer_id,uid,year,mileage,price,s_date,e_date)
+    SELECT offer_id,uid,year,mileage,price,s_date,e_date from otomoto_all
+    UNION
+    SELECT offer_id,uid,year,mileage,price,s_date,e_date from "{table_name}";
+    """.format(table_name = ''.join(table_id[-1])) #last table otomoto_2020mmdd
+
+    clean_up = """--clean otomoto_all
+    delete from otomoto_all;"""
+
+    group_data = """-- group values
+    INSERT INTO otomoto_all(offer_id,uid,year,mileage,price,s_date,e_date)
+    SELECT
+        offer_id,
+	    uid,
+	    year,
+	    price,
+	    mileage,
+        min(s_date) AS S_DATE,
+        max(e_date) AS E_DATE
+    FROM
+        temp_table
+    GROUP BY
+        offer_id;
+    """
+
+    final_clean = """
+    -- clean temp table
+    delete from temp_table;"""
+
+
+    execute_query(conn, temp_table)
+    execute_query(conn, all_table)
+
+    c.execute("""SELECT count(*) FROM otomoto_all""") # is otomoto_all empty?
+    cnt = c.fetchone()
+
+    if cnt[0] == 0:
+        execute_query(conn, initial_transfer) # executescript ?
+    else:
+        execute_query(conn, merge_data)
+        execute_query(conn, clean_up)
+        execute_query(conn, group_data)
+        execute_query(conn, final_clean)
+
+
 
 def clean(file: str):
     destination = './archive/'
@@ -194,27 +290,30 @@ def clean(file: str):
 
 #--------------------------------------------------#
 
-# LIST ALL HTML FILES
-files = []
+if __name__ == "__main__":
+    # LIST ALL HTML FILES
+    start = timer()
+    files = []
 
-for file in os.listdir("./"):
-    if file.endswith(".html"):
-        files.append(file)
-        #files.append(os.path.join("./", file))
-        #print(os.path.join("./", file))
+    for file in os.listdir("./"):
+        if file.endswith(".html"):
+            files.append(file)
+            #files.append(os.path.join("./", file))
+            #print(os.path.join("./", file))
 
+    if not files:
+        print("Nothing here")
+    else:
+        for f in files:
+            print('....')
+            csv_file = f[:-4]+'csv'
+            #parse_html2csv(f)
+            #merge_csv(csv_file)
+            #fill_csv(csv_file)
+            #clean(f)
+            print(f+' - done')
 
-if not files:
-  print("Nothing here")
-else:
-    for f in files:
-        print('....')
-        csv_file = f[:-4]+'csv'
-        parse_html2csv(f)
-        #merge_csv(csv_file)
-        #fill_csv(csv_file)
-        #clean(f)
-        print(f+' - done')
+    merge_sql()
 
-end = timer()
-print(end - start)
+    end = timer()
+    print(end - start)
