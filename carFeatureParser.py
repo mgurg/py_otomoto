@@ -17,12 +17,12 @@ def get_db_car_list():
     c.execute("""SELECT uid,price FROM otomoto_all""")
     x = dict(c.fetchall())
     print(x)
-    exit(0)
-    with open('.\scrapy_otomoto\scrapy_otomoto\spiders\db_car_list.txt', 'w', encoding="utf-8") as f:
-        for item in car_list:
-            f.write("%s\n" % item)
 
-    return car_list
+    # with open('.\scrapy_otomoto\scrapy_otomoto\spiders\db_car_list.txt', 'w', encoding="utf-8") as f:
+    #     for item in car_list:
+    #         f.write("%s\n" % item)
+
+    return x
 
 def get_file_list():
     files = []
@@ -35,8 +35,6 @@ def get_file_list():
             files.append(file) # just filename
             #files.append(os.path.join(src, file)) # file with path
             #print(os.path.join("./", file))
-    #print(files)
-    #exit(0)
     return files
 
 def compare_lists(a,b):
@@ -136,7 +134,6 @@ def store_car_sql(fname):
     insert_sql = """INSERT OR IGNORE INTO "{table_name}"
                     VALUES """.format(table_name=table_name) + '(' + str(parse_json2sql(fname))[1:-1]+')'
 
-    #print('(' + str(parse_json2sql(fname))[1:-1]+')')
     #print(insert_sql)
     conn = create_connection('pythonsqlite.db')
     create_table(conn, table_name, car_table_sql)
@@ -151,7 +148,6 @@ def clean(file: str):
 def main():
     tstart = timer()
 
-    files = []
     files = get_file_list()
 
     if not files:
@@ -166,7 +162,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-# TODO:
-# - CLEAN-UP
-# - DB CAR LIST

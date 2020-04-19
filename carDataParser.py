@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import requests, bs4, io, csv, datetime
+import requests, bs4, io, csv
 from timeit import default_timer as timer
 import re
 import os
@@ -10,7 +10,7 @@ from datetime import datetime
 from dbData import create_connection,create_table,execute_query
 
 def copy_data():
-    now = datetime.datetime.now()
+    now = datetime.now()
 
     src = './scrapy_otomoto/scrapy_otomoto/spiders/' + now.strftime('%Y%m%d') + '/'
     dest = './offers/' + now.strftime('%Y%m%d') + '/'
@@ -18,8 +18,12 @@ def copy_data():
     f_src = './scrapy_otomoto/scrapy_otomoto/spiders/' + 'otomoto_'+ now.strftime('%Y%m%d')+'.html'
     f_dest = './'
 
-    shutil.move(src, dest)
-    shutil.move(f_src, f_dest)
+    try:
+        shutil.move(src, dest)
+        shutil.move(f_src, f_dest)
+    except:
+        print('Move folder error')
+
 
 def get_files_list():
 
@@ -52,7 +56,7 @@ def get_files_list():
     return list(files_list)
 
 
-def parse_html2csv(html_file : str): # PARSE HTML TO CSV
+def parse_html2db(html_file : str): # PARSE HTML TO CSV
     fname = 'otomoto_'+ html_file[8:18] +'.csv'
 
     #csv_header = 'offer_id,city,region,model,year,mileage,fuel_type,displacement,price,currency,pub_date,duration,end_price'+'\n'
@@ -160,8 +164,9 @@ def parse_html2csv(html_file : str): # PARSE HTML TO CSV
     #csv_content = ''.join(csv_list).strip()
     #carFile.write(csv_content)
     #carFile.close()
-    print('CHK: ', fname)
-    print(fname[:-6].replace("-", ""))
+
+    #print('CHK: ', fname)
+    #print(fname[:-6].replace("-", ""))
 
     sql_str = """CREATE TABLE IF NOT EXISTS "{table_name}" (
 	    "offer_id"	INTEGER NOT NULL PRIMARY KEY,
@@ -180,8 +185,6 @@ def parse_html2csv(html_file : str): # PARSE HTML TO CSV
     # export to SQLite in one query
     conn = create_connection('pythonsqlite.db')
     create_table(conn, fname[:-6].replace("-", ""), sql_str)
-
-    print('SQL1')
 
     query_content = '(' + ''.join(sql_list) + ')'.strip()
     last_char_index = query_content.rfind(",")
@@ -332,7 +335,7 @@ def clean(file: str):
 
 def main():
     start = timer()
-    #copy_data()
+    copy_data()
     files = get_files_list()
 
     if not files:
@@ -340,7 +343,7 @@ def main():
     else:
         for f in files:
             print('....')
-            parse_html2csv(f)
+            parse_html2db(f)
             merge_sql()
             clean(f)
             print(f+' - done')

@@ -35,7 +35,3 @@ def execute_query(connection, query):
 
 
 database = 'pythonsqlite.db'
-
-     # create a database connection
-
-# https://stackoverflow.com/questions/14303573/join-two-different-tables-and-remove-duplicated-entries

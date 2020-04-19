@@ -4,7 +4,7 @@ import seaborn as sns
 from matplotlib import pyplot as plt
 from timeit import default_timer as timer
 
-start = timer()
+
 df = pd.read_csv('./my_df.csv')
 
 def general():
@@ -32,10 +32,13 @@ def mileage():
     plt.savefig('./img/mileage.png', bbox_inches='tight')
     plt.close('all')
 
-general()
-displacement()
-duration()
-mileage()
+if __name__ == "__main__":
+    start = timer()
 
-end = timer()
-print(end - start)
+    general()
+    displacement()
+    duration()
+    mileage()
+
+    end = timer()
+    print(end - start)

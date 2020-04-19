@@ -96,7 +96,7 @@ class OtomotoSpider(scrapy.Spider):
         # car_json = json.loads(json_data)
 
         #file_name =  response.url[-13:] # ID6CDXN8.html
-        file_name = str(response.url).rpartition('-')[2]
+        file_name = str(response.url).rpartition('-')[2] # ID6CDXN8
         script_dir = os.path.dirname(__file__)
         now = datetime.datetime.now()
 
@@ -115,10 +115,4 @@ class OtomotoSpider(scrapy.Spider):
 
         with open(abs_file_path, "a+") as text_file:
             text_file.write(result.group(2))
-            # ID6CDXN8
-            # ID6CQOCT
 
-    # def parse_list(self):
-    #     with open('./otomoto_'+now.strftime('%Y%m%d')+'.txt', "rt", ,encoding='utf-8') as f:
-    #         start_urls = [url.strip() for url in f.readlines()]
-    #     print(start_urls)
