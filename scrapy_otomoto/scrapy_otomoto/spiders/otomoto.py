@@ -4,8 +4,10 @@ import json
 import datetime
 import time
 import re
+import os
 import sys
 import pathlib
+import shutil
 
 class OtomotoSpider(scrapy.Spider):
     name = 'otomoto'
@@ -18,7 +20,6 @@ class OtomotoSpider(scrapy.Spider):
     start_urls = ['https://www.otomoto.pl/osobowe/toyota/yaris/ii-2005-2011/']
 
     def parse(self, response):
-
         f_car_list = "db_car_list.txt"
         lines = []
         if pathlib.Path(f_car_list).exists ():
@@ -34,7 +35,7 @@ class OtomotoSpider(scrapy.Spider):
         lastPage =  response.xpath("//span[@class='page']//text()").extract()[-1]# extract offer list
 
         offers = response.xpath("//div[@class='offers list']").extract() # extract offer list
-        data = json.loads(response.xpath('//script[@type="application/ld+json"]//text()').extract_first()) # extract of ld+json from page
+        #data = json.loads(response.xpath('//script[@type="application/ld+json"]//text()').extract_first()) # extract of ld+json from page
         offer_url =  response.css('article').xpath('@data-href').getall()
 
         current_page = response.meta.get("page", 1)
@@ -61,12 +62,13 @@ class OtomotoSpider(scrapy.Spider):
         with open('./otomoto_'+now.strftime('%Y%m%d')+'.html', 'a',encoding='utf-8') as f:
             for item in offers:
 				# remove double spaces to shrink file size
-                f.write("%s\n" % item.replace("  ", ""))
+                f.write("%s" % item.replace("  ", ""))
 
-        with open('./otomoto_'+now.strftime('%Y%m%d')+'.json', 'a') as j:
+        #JSON
+        #with open('./otomoto_'+now.strftime('%Y%m%d')+'.json', 'a') as j:
             # this would place the entire output on one line
             # use json.dump(lista_items, f, indent=4) to "pretty-print" with four spaces per indent
-            json.dump(data, j, indent=4)
+            #json.dump(data, j, indent=4)
 
         with open('./otomoto_'+now.strftime('%Y%m%d')+'.txt', 'a',encoding='utf-8') as u:
             for url_item in offer_url:
@@ -93,8 +95,25 @@ class OtomotoSpider(scrapy.Spider):
         # json_data = data[start:stop]
         # car_json = json.loads(json_data)
 
-        file_name =  response.url[-13:] # ID6CDXN8.html
-        with open(file_name, "a") as text_file:
+        #file_name =  response.url[-13:] # ID6CDXN8.html
+        file_name = str(response.url).rpartition('-')[2]
+        script_dir = os.path.dirname(__file__)
+        now = datetime.datetime.now()
+
+        if not os.path.exists(now.strftime('%Y%m%d')):
+            try:
+                os.mkdir(now.strftime('%Y%m%d'))
+            except OSError:
+                print ("Creation of the directory %s failed" % path)
+            else:
+                print ("Successfully created the directory %s" % path)
+
+        rel_path = now.strftime('%Y%m%d') + '/'+ file_name
+        abs_file_path = os.path.join(script_dir, rel_path)
+
+        print(abs_file_path)
+
+        with open(abs_file_path, "a+") as text_file:
             text_file.write(result.group(2))
             # ID6CDXN8
             # ID6CQOCT

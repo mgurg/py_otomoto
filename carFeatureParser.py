@@ -14,8 +14,10 @@ def get_db_car_list():
     car_list = []
     conn = create_connection('pythonsqlite.db')
     c = conn.cursor()
-    x=c.execute("""SELECT uid FROM otomoto_all""")
+    c.execute("""SELECT uid,price FROM otomoto_all""")
+    x = dict(c.fetchall())
     print(x)
+    exit(0)
     with open('.\scrapy_otomoto\scrapy_otomoto\spiders\db_car_list.txt', 'w', encoding="utf-8") as f:
         for item in car_list:
             f.write("%s\n" % item)
@@ -23,13 +25,18 @@ def get_db_car_list():
     return car_list
 
 def get_file_list():
-    # list all unique cars data in files
-    for file in os.listdir("./offers/cars/"):
-        if file.endswith(".html"):
-            #files.append(file) # just filename
-            files.append(os.path.join("./offers/cars/", file)) # file with path
-            #print(os.path.join("./", file))
+    files = []
+    now = datetime.now()
+    src = "./offers/"+ now.strftime('%Y%m%d')+'/'
 
+    # list all unique cars data in files
+    for file in os.listdir(src):
+        if file.endswith(".html"):
+            files.append(file) # just filename
+            #files.append(os.path.join(src, file)) # file with path
+            #print(os.path.join("./", file))
+    #print(files)
+    #exit(0)
     return files
 
 def compare_lists(a,b):
@@ -49,12 +56,18 @@ def parse_json_key(json, key):
     return buf
 
 def parse_json2sql(fname):
-    with open(fname) as f:
+
+    now = datetime.now()
+    src = "./offers/"+ now.strftime('%Y%m%d')+'/'
+    file_path = os.path.join(src, fname)
+
+    with open(file_path) as f:
         data = json.load(f)
+        #print(data)
 
     offer_id = parse_json_key(data, 'ad_id')
     user_id = parse_json_key(data,'user_id')
-    UID = fname[-13:-5]
+    UID = fname[-13:-5] # split('.')
     private_business = parse_json_key(data,'private_business')
     region = parse_json_key(data,'region')
     subregion = parse_json_key(data,'subregion')
@@ -135,10 +148,7 @@ def clean(file: str):
     shutil.move(file, destination+file)
     os.remove(file)
 
-#----------------------------------------------------------------------------------------------------------------------
-
-
-if __name__ == "__main__":
+def main():
     tstart = timer()
 
     files = []
@@ -149,10 +159,13 @@ if __name__ == "__main__":
     else:
         for fname in files:
             store_car_sql(fname)
-            #clean(fname)
     end = timer()
     print('Time: '+ str(end - tstart))
-#get_db_car_list()
+
+#----------------------------------------------------------------------------------------------------------------------
+
+if __name__ == "__main__":
+    main()
 
 # TODO:
 # - CLEAN-UP
