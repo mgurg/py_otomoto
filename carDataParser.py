@@ -266,7 +266,7 @@ def merge_sql():
         "s_date" TEXT,
         "e_date" TEXT)"""
 
-    all_table = """--create temporary table
+    all_table = """--create otomoto_all table
     CREATE TABLE IF NOT EXISTS "otomoto_all" (
 	    "offer_id"	INTEGER NOT NULL,
         "uid"   TEXT,
@@ -297,8 +297,8 @@ def merge_sql():
         offer_id,
 	    uid,
 	    year,
+        mileage,
 	    price,
-	    mileage,
         min(s_date) AS S_DATE,
         max(e_date) AS E_DATE
     FROM
