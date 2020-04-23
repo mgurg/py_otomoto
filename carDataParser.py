@@ -326,8 +326,6 @@ def merge_sql():
         execute_query(conn, group_data)
         execute_query(conn, final_clean)
 
-
-
 def clean(file: str):
     destination = './offers/'
     shutil.move(file, destination+file)
