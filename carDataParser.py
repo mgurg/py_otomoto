@@ -7,7 +7,7 @@ import os
 import pandas as pd
 import shutil
 from datetime import datetime
-from dbData import create_connection,create_table,execute_query
+from dbData import create_connection,create_table,execute_query,fetch_all_data,fetch_single_item
 
 def copy_data():
     now = datetime.now()
@@ -25,9 +25,9 @@ def copy_data():
         print('Move folder error')
 
 
-def get_files_list():
+def get_files_list(connection):
 
-    conn = create_connection('pythonsqlite.db')
+    #conn = create_connection('pythonsqlite.db')
     table_id_sql = """
     SELECT name
     FROM sqlite_master
@@ -35,9 +35,11 @@ def get_files_list():
        name LIKE 'otomoto_2%'
     ORDER BY name ASC;"""
 
-    c = conn.cursor()
-    c.execute(table_id_sql)
-    table_id = c.fetchall()
+    #c = conn.cursor()
+    #c.execute(table_id_sql)
+    #table_id = c.fetchall()
+
+    table_id = fetch_all_data(connection, table_id_sql)
 
     db_files = [i[0]+'.html' for i in table_id]
 
@@ -56,7 +58,7 @@ def get_files_list():
     return list(files_list)
 
 
-def parse_html2db(html_file : str): # PARSE HTML TO CSV
+def parse_html2db(connection, html_file : str): # PARSE HTML TO CSV
     fname = 'otomoto_'+ html_file[8:18] +'.csv'
 
     #csv_header = 'offer_id,city,region,model,year,mileage,fuel_type,displacement,price,currency,pub_date,duration,end_price'+'\n'
@@ -183,8 +185,8 @@ def parse_html2db(html_file : str): # PARSE HTML TO CSV
         );""".format(table_name=fname[:-6].replace("-", ""))
 
     # export to SQLite in one query
-    conn = create_connection('pythonsqlite.db')
-    create_table(conn, fname[:-6].replace("-", ""), sql_str)
+    #conn = create_connection('pythonsqlite.db')
+    create_table(connection, sql_str)
 
     query_content = '(' + ''.join(sql_list) + ')'.strip()
     last_char_index = query_content.rfind(",")
@@ -192,7 +194,7 @@ def parse_html2db(html_file : str): # PARSE HTML TO CSV
 
     #print(sql_content)
 
-    execute_query(conn, sql_content[1:].strip())
+    execute_query(connection, sql_content[1:].strip())
 
 def merge_csv(csv_file : str):
 # merge two csv files form consecutive days  into one my_df file
@@ -241,8 +243,8 @@ def fill_csv(csv_file : str):
     #my_df['offer_id'] = my_df['offer_id'].astype('int64')
     my_df.to_csv (r'.\my_df.csv', index = None, header=True, encoding="utf-8")
 
-def merge_sql():
-    conn = create_connection('pythonsqlite.db')
+def merge_sql(connection):
+    #conn = create_connection('pythonsqlite.db')
 
     table_id_sql = """
     SELECT name
@@ -251,9 +253,13 @@ def merge_sql():
        name LIKE 'otomoto_2%'
     ORDER BY name ASC;"""
 
-    c = conn.cursor()
-    c.execute(table_id_sql)
-    table_id = c.fetchall()
+    #c = conn.cursor()
+    #c.execute(table_id_sql)
+    #table_id = c.fetchall()
+
+    table_id = fetch_all_data(connection, table_id_sql)
+
+
     print(''.join(table_id[-1]))
 
     temp_table = """--create temporary table
@@ -311,20 +317,22 @@ def merge_sql():
     -- clean temp table
     delete from temp_table;"""
 
+    # create tables if missing
+    execute_query(connection, temp_table)
+    execute_query(connection, all_table)
 
-    execute_query(conn, temp_table)
-    execute_query(conn, all_table)
-
-    c.execute("""SELECT count(*) FROM otomoto_all""") # is otomoto_all empty?
-    cnt = c.fetchone()
+    cnt_sql = """SELECT count(*) FROM otomoto_all"""
+    cnt = fetch_single_item(connection, cnt_sql)
+    #c.execute("""SELECT count(*) FROM otomoto_all""") # is otomoto_all empty?
+    #cnt = c.fetchone()
 
     if cnt[0] == 0:
-        execute_query(conn, initial_transfer) # executescript ?
+        execute_query(connection, initial_transfer) # executescript ?
     else:
-        execute_query(conn, merge_data)
-        execute_query(conn, clean_up)
-        execute_query(conn, group_data)
-        execute_query(conn, final_clean)
+        execute_query(connection, merge_data)
+        execute_query(connection, clean_up)
+        execute_query(connection, group_data)
+        execute_query(connection, final_clean)
 
 def clean(file: str):
     destination = './offers/'
@@ -333,19 +341,23 @@ def clean(file: str):
 
 def main():
     start = timer()
+
+    conn = create_connection('pythonsqlite.db')
+
     copy_data()
-    files = get_files_list()
+    files = get_files_list(conn)
 
     if not files:
         print("Nothing here")
     else:
         for f in files:
             print('....')
-            parse_html2db(f)
-            merge_sql()
+            parse_html2db(conn, f)
+            merge_sql(conn)
             clean(f)
             print(f+' - done')
 
+    conn.close()
     end = timer()
     print(end - start)
 

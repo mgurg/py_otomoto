@@ -96,7 +96,7 @@ def parse_json2sql(fname):
     engine_code, engine_capacity, vin, fuel_type, engine_power, gearbox, transmission, body_type,
     door_count,nr_seats, color, features, price_raw, currency, country_origin,registration, date]
 
-def store_car_sql(fname):
+def store_car_sql(connection, fname):
     table_name = 'all_offers'
 
     car_table_sql ="""CREATE TABLE IF NOT EXISTS "{table_name}" (
@@ -135,9 +135,9 @@ def store_car_sql(fname):
                     VALUES """.format(table_name=table_name) + '(' + str(parse_json2sql(fname))[1:-1]+')'
 
     #print(insert_sql)
-    conn = create_connection('pythonsqlite.db')
-    create_table(conn, table_name, car_table_sql)
-    execute_query(conn,insert_sql)
+    #conn = create_connection('pythonsqlite.db')
+    create_table(connection, car_table_sql)
+    execute_query(connection,insert_sql)
     #execute_query(conn, "DROP TABLE {table_name};".format(table_name=table_name))
 
 def clean(file: str):
@@ -148,13 +148,18 @@ def clean(file: str):
 def main():
     tstart = timer()
 
+    conn = create_connection('pythonsqlite.db')
+
     files = get_file_list()
 
     if not files:
         print("No offers to process")
     else:
         for fname in files:
-            store_car_sql(fname)
+            store_car_sql(conn, fname)
+
+    conn.close()
+
     end = timer()
     print('Time: '+ str(end - tstart))
 

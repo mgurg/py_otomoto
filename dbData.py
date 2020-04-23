@@ -37,5 +37,16 @@ def execute_query(connection, query):
     except Error as e:
         print(f"The error '{e}' occurred")
 
+def fetch_all_data(connection, sql_query):
+    c = connection.cursor()
+    c.execute(sql_query)
+    db_data = c.fetchall()
+    return  db_data
+
+def fetch_single_item(connection, sql_query):
+    c = connection.cursor()
+    c.execute(sql_query) # is otomoto_all empty?
+    cnt = c.fetchone()
+    return cnt
 
 
