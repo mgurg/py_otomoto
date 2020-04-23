@@ -27,17 +27,12 @@ def copy_data():
 
 def get_files_list(connection):
 
-    #conn = create_connection('pythonsqlite.db')
     table_id_sql = """
     SELECT name
     FROM sqlite_master
     WHERE type = 'table' AND
        name LIKE 'otomoto_2%'
     ORDER BY name ASC;"""
-
-    #c = conn.cursor()
-    #c.execute(table_id_sql)
-    #table_id = c.fetchall()
 
     table_id = fetch_all_data(connection, table_id_sql)
 
@@ -60,9 +55,6 @@ def get_files_list(connection):
 
 def parse_html2db(connection, html_file : str): # PARSE HTML TO CSV
     fname = 'otomoto_'+ html_file[8:18] +'.csv'
-
-    #csv_header = 'offer_id,city,region,model,year,mileage,fuel_type,displacement,price,currency,pub_date,duration,end_price'+'\n'
-    #csv_list=[csv_header]
 
     sql_header = """
             INSERT INTO
@@ -114,26 +106,6 @@ def parse_html2db(connection, html_file : str): # PARSE HTML TO CSV
         price = car_value.splitlines()[1]
         currency = str(car_value.splitlines()[2]) #currency = price[len(price)-4:].strip()
 
-        #print(html_file)
-        #pub_date = html_file[8:16]
-        #print(pub_date)
-        #duration = "1"
-        #end_price = "-1"
-
-        # csv_rows = offer_id + ',' +\
-        #             city + ','+\
-        #             region  + ','+\
-        #             model + ','+\
-        #             year + ','+\
-        #             mileage + ','+\
-        #             fuel_type + ','+\
-        #             displacement + ','+\
-        #             price + ','+\
-        #             currency + ','+\
-        #             pub_date + ',' +\
-        #             duration + ',' +\
-        #             end_price+'\n'
-
         sql_row = """("{offer_id}",
                         "{uid}",
                         "{url}",
@@ -159,16 +131,6 @@ def parse_html2db(connection, html_file : str): # PARSE HTML TO CSV
                     )
 
         sql_list.append(sql_row)
-        #csv_list.append(csv_rows)
-
-    # export to csv at once
-    #carFile = io.open(fname, 'w', encoding="utf-8")
-    #csv_content = ''.join(csv_list).strip()
-    #carFile.write(csv_content)
-    #carFile.close()
-
-    #print('CHK: ', fname)
-    #print(fname[:-6].replace("-", ""))
 
     sql_str = """CREATE TABLE IF NOT EXISTS "{table_name}" (
 	    "offer_id"	INTEGER NOT NULL PRIMARY KEY,
@@ -185,7 +147,6 @@ def parse_html2db(connection, html_file : str): # PARSE HTML TO CSV
         );""".format(table_name=fname[:-6].replace("-", ""))
 
     # export to SQLite in one query
-    #conn = create_connection('pythonsqlite.db')
     create_table(connection, sql_str)
 
     query_content = '(' + ''.join(sql_list) + ')'.strip()
@@ -193,58 +154,9 @@ def parse_html2db(connection, html_file : str): # PARSE HTML TO CSV
     sql_content = query_content[:last_char_index]+';'
 
     #print(sql_content)
-
     execute_query(connection, sql_content[1:].strip())
 
-def merge_csv(csv_file : str):
-# merge two csv files form consecutive days  into one my_df file
-    #csv_file = "carData_2019-12-31.csv"
-    #csv_file = "carData_2020-01-01.csv"
-
-    df2 = pd.read_csv(csv_file,index_col=False,encoding='utf-8')
-
-    if os.path.isfile('my_df.csv') == False:
-        my_df  = pd.DataFrame(columns =['offer_id','city','region','model','year','mileage','fuel_type','displacement','price','currency','pub_date','duration','end_price'])
-        my_df.to_csv('my_df.csv',index=False)
-    else:
-        my_df = pd.read_csv("my_df.csv",encoding='utf-8')
-
-    if my_df.empty:
-        print('my_df is empty!')
-        df2.to_csv('my_df.csv',index=False)
-        return #jump out from merge_csv(csv_file : str)
-    else:
-        print('my_df is NOT empty!')
-        my_df = pd.DataFrame(pd.concat([my_df, df2], ignore_index=True))
-        my_df = my_df.drop_duplicates(subset=['offer_id'])
-        my_df.to_csv('my_df.csv',index=False)
-
-def fill_csv(csv_file : str):
-# compare entries
-    my_df = pd.read_csv('my_df.csv',
-                   index_col=False,
-                   encoding='utf-8')
-
-    df2 = pd.read_csv(csv_file,
-                  index_col=False,
-                  encoding='utf-8')
-
-
-    for j, jrow in enumerate(my_df.itertuples(), 1):
-        my_df_IDX = jrow.offer_id
-
-        for k, krow in enumerate(df2.itertuples(), 1):
-            if (my_df_IDX == krow.offer_id):
-
-                my_df.at[j-1, 'duration'] = my_df.iloc[j-1]['duration'] + 1 # increase day counter
-                my_df.at[j-1, 'end_price'] = df2.iloc[k-1]['price'] # assign last price from today file
-
-
-    #my_df['offer_id'] = my_df['offer_id'].astype('int64')
-    my_df.to_csv (r'.\my_df.csv', index = None, header=True, encoding="utf-8")
-
 def merge_sql(connection):
-    #conn = create_connection('pythonsqlite.db')
 
     table_id_sql = """
     SELECT name
@@ -253,13 +165,7 @@ def merge_sql(connection):
        name LIKE 'otomoto_2%'
     ORDER BY name ASC;"""
 
-    #c = conn.cursor()
-    #c.execute(table_id_sql)
-    #table_id = c.fetchall()
-
     table_id = fetch_all_data(connection, table_id_sql)
-
-
     print(''.join(table_id[-1]))
 
     temp_table = """--create temporary table
@@ -323,8 +229,6 @@ def merge_sql(connection):
 
     cnt_sql = """SELECT count(*) FROM otomoto_all"""
     cnt = fetch_single_item(connection, cnt_sql)
-    #c.execute("""SELECT count(*) FROM otomoto_all""") # is otomoto_all empty?
-    #cnt = c.fetchone()
 
     if cnt[0] == 0:
         execute_query(connection, initial_transfer) # executescript ?

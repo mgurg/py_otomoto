@@ -134,8 +134,6 @@ def store_car_sql(connection, fname):
     insert_sql = """INSERT OR IGNORE INTO "{table_name}"
                     VALUES """.format(table_name=table_name) + '(' + str(parse_json2sql(fname))[1:-1]+')'
 
-    #print(insert_sql)
-    #conn = create_connection('pythonsqlite.db')
     create_table(connection, car_table_sql)
     execute_query(connection,insert_sql)
     #execute_query(conn, "DROP TABLE {table_name};".format(table_name=table_name))

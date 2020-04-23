@@ -44,8 +44,9 @@ def fetch_all_data(connection, sql_query):
     return  db_data
 
 def fetch_single_item(connection, sql_query):
+    # https://towardsdatascience.com/python-sqlite-tutorial-the-ultimate-guide-fdcb8d7a4f30
     c = connection.cursor()
-    c.execute(sql_query) # is otomoto_all empty?
+    c.execute(sql_query)
     cnt = c.fetchone()
     return cnt
 
