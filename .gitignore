@@ -12,6 +12,7 @@
 *.db-journal
 *.txt
 # *.ipynb
+myproject.py
 
 # ignore folders
 data
@@ -150,3 +151,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# configuration files
+*.yml
+*.yaml

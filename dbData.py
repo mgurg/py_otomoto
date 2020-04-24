@@ -21,7 +21,6 @@ def create_table(conn, create_table_sql):
     :param create_table_sql: a CREATE TABLE statement
     :return:
     """
-
     try:
         c = conn.cursor()
         c.execute(create_table_sql)
@@ -49,5 +48,4 @@ def fetch_single_item(connection, sql_query):
     c.execute(sql_query)
     cnt = c.fetchone()
     return cnt
-
 
