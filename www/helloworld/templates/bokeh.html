@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<h2>Interaktywny wykres</h2>
+	<p>Cena samochodu:</p>
+    {{ plot_div|indent(4)|safe }}
+{% endblock %}

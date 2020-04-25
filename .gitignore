@@ -4,7 +4,6 @@
 *.zip
 *.ods
 *.7z
-*.html
 *.json
 *.png
 *.sh
@@ -12,6 +11,7 @@
 *.db-journal
 *.txt
 # *.ipynb
+myproject.py
 
 # ignore folders
 data
@@ -20,6 +20,7 @@ data
 archive
 old
 scrapy
+offers
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -150,3 +151,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# configuration files
+*.yml
+*.yaml

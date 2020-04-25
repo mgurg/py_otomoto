@@ -1,0 +1,68 @@
+    <form>
+      <div class="form-group row">
+        <label for="year" class="col-4 col-form-label">Rocznik</label> 
+        <div class="col-8">
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <div class="input-group-text">
+                <i class="fa fa-calendar"></i>
+              </div>
+            </div> 
+            <input id="year" name="year" type="text" class="form-control">
+          </div>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label for="mileage" class="col-4 col-form-label">Przebieg</label> 
+        <div class="col-8">
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <div class="input-group-text">
+                <i class="fa fa-car"></i>
+              </div>
+            </div> 
+            <input id="mileage" name="mileage" type="text" class="form-control">
+          </div>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label for="fuel" class="col-4 col-form-label">Paliwo</label> 
+        <div class="col-8">
+          <select id="fuel" name="fuel" class="custom-select">
+            <option value="petrol">Benzyna</option>
+            <option value="diesesl">Diesel</option>
+            <option value="petrol-lpg">Benzyna+LPG</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label class="col-4">Wyposażenie</label> 
+        <div class="col-8">
+          <div class="custom-control custom-checkbox custom-control-inline">
+            <input name="features" id="features_0" type="checkbox" class="custom-control-input" value="air-conditioning"> 
+            <label for="features_0" class="custom-control-label">Klimatyzacja manualna</label>
+          </div>
+          <div class="custom-control custom-checkbox custom-control-inline">
+            <input name="features" id="features_1" type="checkbox" class="custom-control-input" value="front-electric-windows"> 
+            <label for="features_1" class="custom-control-label">Elektryczne szyby przednie</label>
+          </div>
+          <div class="custom-control custom-checkbox custom-control-inline">
+            <input name="features" id="features_2" type="checkbox" class="custom-control-input" value="central-lock"> 
+            <label for="features_2" class="custom-control-label">Centralny zamek</label>
+          </div>
+          <div class="custom-control custom-checkbox custom-control-inline">
+            <input name="features" id="features_3" type="checkbox" class="custom-control-input" value="alloy-wheels"> 
+            <label for="features_3" class="custom-control-label">Alufelgi</label>
+          </div>
+          <div class="custom-control custom-checkbox custom-control-inline">
+            <input name="features" id="features_4" type="checkbox" class="custom-control-input" value="steering-whell-comands"> 
+            <label for="features_4" class="custom-control-label">Wielofunkcyjna kierownica</label>
+          </div>
+        </div>
+      </div> 
+      <div class="form-group row">
+        <div class="offset-4 col-8">
+          <button name="submit" type="submit" class="btn btn-primary">Submit</button>
+        </div>
+      </div>
+    </form>
