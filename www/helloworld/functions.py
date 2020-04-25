@@ -18,3 +18,7 @@ WHERE
     conn = sqlite3.connect("pythonsqlite.db")
     data = pd.read_sql_query(sql_query, conn)
     return data
+
+def predict_price(year, mileage):
+    price = mileage + year
+    return price

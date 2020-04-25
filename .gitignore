@@ -4,7 +4,6 @@
 *.zip
 *.ods
 *.7z
-*.html
 *.json
 *.png
 *.sh
@@ -21,6 +20,7 @@ data
 archive
 old
 scrapy
+offers
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

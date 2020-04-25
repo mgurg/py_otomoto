@@ -246,7 +246,7 @@ def clean(file: str):
 def main():
     start = timer()
 
-    conn = create_connection('pythonsqlite.db')
+    conn = create_connection()
 
     copy_data()
     files = get_files_list(conn)

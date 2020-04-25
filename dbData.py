@@ -1,10 +1,14 @@
 import sqlite3
 import os
 from sqlite3 import Error
+import yaml
+
+with open("config.yml", "r") as ymlfile:
+    cfg = yaml.load(ymlfile)
 
 # create a default path to connect to and create (if necessary) a database
 # called 'pythonsqlite.db' in the same directory as this script
-DEFAULT_PATH = os.path.join(os.path.dirname(__file__), 'pythonsqlite.db')
+DEFAULT_PATH = os.path.join(os.path.dirname(__file__), cfg['development']['database'])
 
 def create_connection(db_path=DEFAULT_PATH):
     connection = None

@@ -1,10 +1,10 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, redirect, session, url_for, flash
 from flask_wtf import FlaskForm
-from wtforms import StringField, SelectField, BooleanField
-from wtforms.validators import InputRequired
+from wtforms import StringField, SelectField, BooleanField, SubmitField
+from wtforms.validators import InputRequired, NumberRange, Regexp, ValidationError
 
 import pandas as pd
-from functions import get_data
+from functions import get_data, predict_price
 
 from bokeh.embed import components
 from bokeh.plotting import figure
@@ -15,23 +15,26 @@ import yaml
 with open("config.yml", "r") as ymlfile:
     cfg = yaml.load(ymlfile)
 
-#from bokeh.util.string import encode_utf8
-
 app = Flask(__name__)
 app.config['SECRET_KEY'] = cfg['flask']['wtf_password']
 df = get_data()
 
+def field_check(form, field):
+    if len(field.data) > 4:
+        raise ValidationError('Field must be less than 4 characters')
 
 class LoginForm(FlaskForm):
-    year = StringField('Rocznik', validators=[InputRequired()])
-    mileage = StringField('mileage',validators=[InputRequired()])
-    fuel = SelectField('fuel',
-                        choices=[('petrol', 'benzyna'), ('diesel', 'diesel'), ('petrol+lpg', 'beznyna+lpg')],
+    year = StringField('Rocznik', validators=[InputRequired(), Regexp("\d{4}", message="Podaj poprawnie rocznik np.: 2009") ])
+    mileage = StringField('Przebieg',validators=[InputRequired(), Regexp("\d", message="Podaj poprawny przebieg")])
+    fuel = SelectField('Rodzaj paliwa:',
+                        choices=[('petrol', 'benzyna'), ('diesel', 'diesel'), ('petrol-lpg', 'benzyna+lpg')],
                         default='benzyna')
     air_conditioning = BooleanField('Klimatyzacja')
     front_electric_windows = BooleanField('Elektryczne szyby przednie')
+    submit = SubmitField(label="Submit")
 
-
+    # https://www.youtube.com/watch?v=xRZwU9lqUbs
+    # https://github.com/soumilshah1995/Flask-Captcha-Python
 
 @app.route("/")
 def home():
@@ -46,7 +49,13 @@ def form():
     form = LoginForm()
 
     if form.validate_on_submit():
-        return '<h1>Year: {}. Mileage {}. Fuel {}'.format(form.year.data, form.mileage.data, form.fuel.data)
+        year = int(form.year.data)
+        mileage = int(form.mileage.data)
+        price = predict_price(year, mileage)
+        flash('Wartość samochodu: {}'.format(price))
+        #return '<h1>Cena powinna wynosić: {}<h1>'.format(price)
+        # return '<h1>Year: {}. Mileage {}. Fuel {}<h1>'.format(form.year.data, form.mileage.data, form.fuel.data)
+        #return redirect(url_for('bokeh'))
     return render_template('form.html', form=form)
 
 @app.route('/bokeh')

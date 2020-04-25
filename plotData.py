@@ -86,6 +86,39 @@ def plot_year():
 
     plt.savefig('./img/sns_year.png')
 
+def plot_duration():
+    year_list = df['duration'].unique()
+
+    x = []
+    y = []
+    for i in year_list:
+        x.append(i)
+        y.append(df[df['duration'] == i ].shape[0])
+
+    sdf = pd.DataFrame(dict(x=x, y=y)).sort_values(by=['x'])
+
+    sns.set_style("darkgrid")
+    plt.figure(figsize=(20,5))
+    ax = sns.barplot(x=x, y=y, data=sdf, palette=("YlGnBu"))
+    ax.set(xlabel='długość trwania ogłoszeń (w dniach)', ylabel='liczba ogłoszeń')
+    sns.set_context("talk")
+    plt.savefig('./img/sns_duration.png')
+
+def plot_price():
+    sns.set_style("darkgrid")
+    plt.figure(figsize=(18,7))
+    chart = sns.distplot(df['price'], bins=30, kde=False, rug=True)
+    chart.set(xlabel='Cena', ylabel='liczba ogłoszeń')
+    plt.savefig('./img/sns_price.png')
+
+
+def plot_mileage():
+    sns.set_style("darkgrid")
+    plt.figure(figsize=(18,7))
+    chart = sns.distplot(df['mileage'], bins=30, kde=False, rug=True)
+    chart.set(xlabel='Cena', ylabel='liczba ogłoszeń')
+    plt.savefig('./img/sns_mileage.png')
+
 def num_test():
     A = np.matrix([[1.], [3.]])
     B = np.matrix([[2., 3.]])
@@ -130,6 +163,9 @@ if __name__ == "__main__":
     feature_columns()
 
     plot_year()
+    plot_duration()
+    plot_price()
+    plot_mileage()
     #num_test()
 
     #general()
