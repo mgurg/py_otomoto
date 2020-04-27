@@ -12,7 +12,7 @@ cd ./scarapy_otomoto/
 scrapy crawl otomoto
 ```
 
-This will generate `otomoto_YYMMDD.html` file with all cars that are currently available and `YYMMDD` folder.  Folder contains  separate JSON files with details of each car in.  
+This will generate `otomoto_YYMMDD.html` file with all cars that are currently available and `YYMMDD` folder.  Folder contains  separate JSON files with details of each car.  
 
 
 
