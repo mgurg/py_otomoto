@@ -22,9 +22,9 @@ This will generate `otomoto_YYMMDD.html` file with all cars that are currently a
 
 ## www
 
-Simple flask application with visualization of data
+Simple flask application with visualization of data. Preview: [remontmaszyn.pl](remontmaszyn.pl)
 
-
+![](http://remontmaszyn.pl/static/img/mainpage.jpg)
 
 
 
