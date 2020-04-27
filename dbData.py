@@ -4,7 +4,7 @@ from sqlite3 import Error
 import yaml
 
 with open("config.yml", "r") as ymlfile:
-    cfg = yaml.load(ymlfile)
+    cfg = yaml.load(ymlfile, Loader=yaml.SafeLoader)
 
 # create a default path to connect to and create (if necessary) a database
 # called 'pythonsqlite.db' in the same directory as this script
@@ -53,3 +53,11 @@ def fetch_single_item(connection, sql_query):
     cnt = c.fetchone()
     return cnt
 
+def fetch_db_data(connection, sql_query, all:bool):
+    c = connection.cursor()
+    c.execute(sql_query)
+    if all == True:
+        db_data = c.fetchall()
+    else:
+        db_data = c.fetchone()
+    return  db_data

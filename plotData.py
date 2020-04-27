@@ -12,13 +12,14 @@ def openblas_setup():
 
     # https://github.com/numpy/numpy/issues/11517
     # https://github.com/xianyi/OpenBLAS/issues/2306
-    # OPENBLAS_CORETYPE=Sandybridge
+    # export OPENBLAS_CORETYPE=Sandybridge
     # OPENBLAS_CORETYPE=prescott
     os.environ["OPENBLAS_CORETYPE"] ="Sandybridge"
     #os.environ["OPENBLAS_CORETYPE"] = "prescott"
     #os.environ["OMP_NUM_THREADS"] = "1"
     #os.environ["OPENBLAS_VERBOSE"] =2
     p = os.getenv("OPENBLAS_CORETYPE")
+
     print(p)
 
 def get_sqlite_data():
@@ -80,11 +81,12 @@ def plot_year():
 
     sns.set_style("darkgrid")
     sns.set_context("talk")
-    plt.figure(figsize=(20,6))
+    plt.figure(figsize=(15,5))
     ax = sns.barplot(x=x, y=y, data=sdf, palette=("YlGnBu"))
     ax.set(xlabel='rocznik', ylabel='liczba ogłoszeń')
 
-    plt.savefig('./img/sns_year.png')
+    plt.savefig('./img/sns_year.png',bbox_inches='tight')
+    plt.close()
 
 def plot_duration():
     year_list = df['duration'].unique()
@@ -98,26 +100,38 @@ def plot_duration():
     sdf = pd.DataFrame(dict(x=x, y=y)).sort_values(by=['x'])
 
     sns.set_style("darkgrid")
-    plt.figure(figsize=(20,5))
+    sns.set(rc={'figure.figsize':(15,5)})
     ax = sns.barplot(x=x, y=y, data=sdf, palette=("YlGnBu"))
     ax.set(xlabel='długość trwania ogłoszeń (w dniach)', ylabel='liczba ogłoszeń')
     sns.set_context("talk")
-    plt.savefig('./img/sns_duration.png')
+    plt.savefig('./img/sns_duration.png',bbox_inches='tight')
+    plt.close()
 
 def plot_price():
     sns.set_style("darkgrid")
-    plt.figure(figsize=(18,7))
+    sns.set(rc={'figure.figsize':(15,5)})
     chart = sns.distplot(df['price'], bins=30, kde=False, rug=True)
     chart.set(xlabel='Cena', ylabel='liczba ogłoszeń')
-    plt.savefig('./img/sns_price.png')
+    plt.savefig('./img/sns_price.png', bbox_inches='tight')
+    plt.close()
 
 
 def plot_mileage():
     sns.set_style("darkgrid")
-    plt.figure(figsize=(18,7))
+    #plt.figure(figsize=(15,5))
+    sns.set(rc={'figure.figsize':(15,5)})
     chart = sns.distplot(df['mileage'], bins=30, kde=False, rug=True)
+
     chart.set(xlabel='Cena', ylabel='liczba ogłoszeń')
-    plt.savefig('./img/sns_mileage.png')
+
+    plt.savefig('./img/sns_mileage.png',bbox_inches='tight')
+    plt.close()
+
+def plot_features():
+    f = feature_columns()
+    df[f].hist(bins=2,figsize=(15,15))
+    plt.savefig('./img/sns_features.png',bbox_inches='tight')
+    plt.close()
 
 def num_test():
     A = np.matrix([[1.], [3.]])
@@ -166,6 +180,7 @@ if __name__ == "__main__":
     plot_duration()
     plot_price()
     plot_mileage()
+    plot_features()
     #num_test()
 
     #general()
