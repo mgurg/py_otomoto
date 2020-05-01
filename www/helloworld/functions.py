@@ -19,6 +19,6 @@ WHERE
     data = pd.read_sql_query(sql_query, conn)
     return data
 
-def predict_price(year, mileage):
+def predict_car_price(year, mileage):
     price = mileage + year
     return price

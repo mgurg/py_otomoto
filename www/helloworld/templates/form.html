@@ -28,7 +28,7 @@
               <i class="fa fa-calendar"></i>
             </div>
           </div>
-          {{ form.year(placeholder="Enter name" ,class="form-control", id="year")  }}
+          {{ form.year(placeholder="rok" ,class="form-control", id="year")  }}
           <!-- <input id="year" name="year" type="text" class="form-control"> -->
         </div>
         {% for error in form.year.errors %}
@@ -46,7 +46,7 @@
               <i class="fa fa-car"></i>
             </div>
           </div>
-          {{ form.mileage(placeholder="Enter name" ,class="form-control", id="mileage")  }}
+          {{ form.mileage(placeholder="przebieg w km" ,class="form-control", id="mileage")  }}
           <!-- <input id="mileage" name="mileage" type="text" class="form-control"> -->
         </div>
         {% for error in form.mileage.errors %}

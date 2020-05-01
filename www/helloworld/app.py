@@ -1,10 +1,9 @@
-from flask import Flask, render_template, redirect, session, url_for, flash
+from flask import Flask, render_template, redirect, session, url_for, flash, Blueprint
 from flask_wtf import FlaskForm
 from wtforms import StringField, SelectField, BooleanField, SubmitField
 from wtforms.validators import InputRequired, NumberRange, Regexp, ValidationError
 
 import pandas as pd
-from functions import get_data, predict_price
 
 from bokeh.embed import components
 from bokeh.plotting import figure
@@ -12,11 +11,16 @@ from bokeh.resources import INLINE
 import bokeh_catplot
 import yaml
 
+from functions import get_data, predict_car_price
+
 with open("config.yml", "r") as ymlfile:
     cfg = yaml.load(ymlfile)
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = cfg['flask']['wtf_password']
+
+#otomoto_blueprint = Blueprint('otomoto_blueprint', __name__)
+
 df = get_data()
 
 def field_check(form, field):
@@ -24,8 +28,8 @@ def field_check(form, field):
         raise ValidationError('Field must be less than 4 characters')
 
 class LoginForm(FlaskForm):
-    year = StringField('Rocznik', validators=[InputRequired(), Regexp("\d{4}", message="Podaj poprawnie rocznik np.: 2009") ])
-    mileage = StringField('Przebieg',validators=[InputRequired(), Regexp("\d", message="Podaj poprawny przebieg")])
+    year = StringField('Rocznik', description="rok",validators=[InputRequired(), Regexp("\d{4}", message="Podaj poprawnie rocznik np.: 2009") ])
+    mileage = StringField('Przebieg',description="rok", validators=[InputRequired(), Regexp("^[0-9]*$", message="Podaj poprawny przebieg")])
     fuel = SelectField('Rodzaj paliwa:',
                         choices=[('petrol', 'benzyna'), ('diesel', 'diesel'), ('petrol-lpg', 'benzyna+lpg')],
                         default='benzyna')
@@ -51,7 +55,7 @@ def form():
     if form.validate_on_submit():
         year = int(form.year.data)
         mileage = int(form.mileage.data)
-        price = predict_price(year, mileage)
+        price = predict_car_price(year, mileage)
         flash('Wartość samochodu: {}'.format(price))
         #return '<h1>Cena powinna wynosić: {}<h1>'.format(price)
         # return '<h1>Year: {}. Mileage {}. Fuel {}<h1>'.format(form.year.data, form.mileage.data, form.fuel.data)
@@ -89,6 +93,48 @@ def bokeh():
         show_bokeh=True,
     )
     return html.encode('utf-8')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if 'username' in session:
+        return redirect(url_for('profile'))
+
+    error = None
+    class ServerError(Exception):pass
+
+    # if request.method == 'POST':
+    #     if request.form["action"] == "login":
+    #         try:
+    #             conn = mysql.connect()
+    #             cur = conn.cursor()
+    #             username_form  = request.form['username']
+    #             cur.execute("SELECT COUNT(1) FROM users WHERE login = '" + username_form +"'")
+
+    #             if not cur.fetchone()[0]:
+    #                 raise ServerError('Błędna nazwa użytkownika')
+
+    #             password_form  = request.form['password']
+    #             cur.execute("SELECT password FROM users WHERE login = '" + username_form +"'")
+
+    #             for row in cur.fetchall():
+    #                 if md5(password_form.encode('utf-8')).hexdigest() == row[0]:
+    #                     session['username'] = request.form['username']
+    #                     return redirect(url_for('db_posts_blueprint.database_posts'))
+
+    #             raise ServerError('Błędne hasło')
+
+    #         except ServerError as e:
+    #             error = str(e)
+
+    return render_template('login.html', error=error)
+
+@app.errorhandler(404)
+def not_found(error):
+    return render_template('404.html')
+
+@app.errorhandler(500)
+def internal_error(error):
+    return render_template('500.html')
 
 if __name__ == "__main__":
     app.run(debug=True)
