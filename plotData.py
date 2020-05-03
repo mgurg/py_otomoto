@@ -4,10 +4,19 @@ import seaborn as sns
 import sqlite3
 import matplotlib.pyplot as plt
 from timeit import default_timer as timer
+import logging
 
 # Necessary to run script on VM machine
 import os
 def openblas_setup():
+
+    logging.basicConfig(filename='plot.log',
+                            filemode='a',
+                            format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
+                            datefmt='%H:%M:%S',
+                            level=logging.INFO)
+
+    logging.info("Running openblas_setup")
     # incorrect cpu detection in openblas
 
     # https://github.com/numpy/numpy/issues/11517
@@ -27,6 +36,7 @@ def get_sqlite_data():
     conn = sqlite3.connect("pythonsqlite.db")
     data = pd.read_sql_query(sql_query, conn)
     conn.close()
+    logging.info("Running get_sqlite_data")
     return data
 
 def optimize_df():
@@ -42,6 +52,8 @@ def optimize_df():
     df['nr_seats'] = pd.to_numeric(df['nr_seats'], downcast='unsigned')
     df['price'] = pd.to_numeric(df['price'], downcast='float')
     df['price_raw'] = pd.to_numeric(df['price_raw'], downcast='float')
+
+    logging.info("Running optimize_df")
 
 #car features
 def benefits_to_set(value):
@@ -84,9 +96,10 @@ def plot_year():
     plt.figure(figsize=(15,5))
     ax = sns.barplot(x=x, y=y, data=sdf, palette=("YlGnBu"))
     ax.set(xlabel='rocznik', ylabel='liczba ogłoszeń')
-
     plt.savefig('./img/sns_year.png',bbox_inches='tight')
     plt.close()
+
+    logging.info("Running plot_year")
 
 def plot_duration():
     year_list = df['duration'].unique()
@@ -107,10 +120,12 @@ def plot_duration():
     plt.savefig('./img/sns_duration.png',bbox_inches='tight')
     plt.close()
 
+    logging.info("Running plot_duration")
+
 def plot_price():
     sns.set_style("darkgrid")
     sns.set(rc={'figure.figsize':(15,5)})
-    chart = sns.distplot(df['price'], bins=30, kde=False, rug=True)
+    chart = sns.distplot(df['price'], bins=20, kde=False, rug=True)
     chart.set(xlabel='Cena', ylabel='liczba ogłoszeń')
     plt.savefig('./img/sns_price.png', bbox_inches='tight')
     plt.close()
@@ -133,6 +148,16 @@ def plot_features():
     plt.savefig('./img/sns_features.png',bbox_inches='tight')
     plt.close()
 
+
+def plot_scatter_year():
+    plt.figure(figsize=(15, 5))
+    plt.title('price vs year')
+    plt.xlabel('year')
+    plt.ylabel('price')
+    sns.stripplot(x="year", y="price_raw", data=df)
+    plt.savefig('./img/sns_sca_year.png',bbox_inches='tight')
+    plt.close()
+
 def num_test():
     A = np.matrix([[1.], [3.]])
     B = np.matrix([[2., 3.]])
@@ -141,30 +166,6 @@ def num_test():
     #print(np.show_config())
     print(l)
 
-def general():
-    df.hist(bins=50,figsize=(20,15))
-    plt.savefig('./img/0.png', bbox_inches='tight')
-    plt.close('all')
-
-def displacement():
-    disp_counter = df['displacement'].nunique()
-    df['displacement'].hist(bins=disp_counter,figsize=(20,5))
-    plt.savefig('./img/displacement.png', bbox_inches='tight')
-    plt.close('all')
-
-
-def duration():
-    offer_duration = df['duration'].max()
-    df['duration'].hist(bins=offer_duration,figsize=(20,5))
-    plt.savefig('./img/duration.png', bbox_inches='tight')
-    plt.close('all')
-
-def mileage():
-    ## 99 percentile
-    df_mileage = df[df['mileage'] < np.percentile(df['mileage'],99)]
-    df_mileage['mileage'].hist(bins=150,figsize=(20,5))
-    plt.savefig('./img/mileage.png', bbox_inches='tight')
-    plt.close('all')
 
 if __name__ == "__main__":
     start = timer()
@@ -181,12 +182,10 @@ if __name__ == "__main__":
     plot_price()
     plot_mileage()
     plot_features()
-    #num_test()
+    plot_scatter_year()
 
-    #general()
-    #displacement()
-    #duration()
-    #mileage()
+
+    logging.shutdown()
 
     end = timer()
     print(end - start)

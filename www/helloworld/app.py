@@ -23,13 +23,9 @@ app.config['SECRET_KEY'] = cfg['flask']['wtf_password']
 
 df = get_data()
 
-def field_check(form, field):
-    if len(field.data) > 4:
-        raise ValidationError('Field must be less than 4 characters')
-
 class LoginForm(FlaskForm):
-    year = StringField('Rocznik', description="rok",validators=[InputRequired(), Regexp("\d{4}", message="Podaj poprawnie rocznik np.: 2009") ])
-    mileage = StringField('Przebieg',description="rok", validators=[InputRequired(), Regexp("^[0-9]*$", message="Podaj poprawny przebieg")])
+    year = StringField('Rocznik', validators=[InputRequired(), Regexp("\d{4}", message="Podaj poprawny rok np.: 2009")])
+    mileage = StringField('Przebieg', validators=[InputRequired(), Regexp("^[0-9]*$", message="Podaj poprawny przebieg")])
     fuel = SelectField('Rodzaj paliwa:',
                         choices=[('petrol', 'benzyna'), ('diesel', 'diesel'), ('petrol-lpg', 'benzyna+lpg')],
                         default='benzyna')
@@ -55,8 +51,16 @@ def form():
     if form.validate_on_submit():
         year = int(form.year.data)
         mileage = int(form.mileage.data)
+
+        feat_dict =	{
+            "air_conditioning": form.air_conditioning.data,
+            "front_electric_windows": form.front_electric_windows.data,
+            }
+
+        features = [form.air_conditioning.data, form.front_electric_windows.data]
+
         price = predict_car_price(year, mileage)
-        flash('Wartość samochodu: {}'.format(price))
+        flash('Wartość samochodu: {}, AC: {}'.format(price, form.air_conditioning.data))
         #return '<h1>Cena powinna wynosić: {}<h1>'.format(price)
         # return '<h1>Year: {}. Mileage {}. Fuel {}<h1>'.format(form.year.data, form.mileage.data, form.fuel.data)
         #return redirect(url_for('bokeh'))
