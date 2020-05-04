@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Posty{% endblock %}
+{% block content %}
+    <h2>Post</h2>
+    <p>
+        {% if posts[post_id] %}
+            Oto post - {{ posts[post_id].title }}!
+        {% else %}
+            Posta nie znaleziono :(
+        {% endif %}
+    </p>
+{% endblock %}

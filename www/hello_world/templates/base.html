@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" media="screen" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
 	{% if title %}
-    <title>{{ title }} - Microblog</title>
+    <title>{{ title }} - YII</title>
     {% else %}
     <title>Toyota Yaris II - analiza cen samochodów używanych</title>
     {% endif %}
@@ -15,6 +15,7 @@
 		{{ css_resources|indent(4)|safe }}
 		{{ plot_script|indent(4)|safe }}
 	{% endif %}
+
 </head>
 
 <body>
@@ -25,15 +26,13 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div class="navbar-nav">
-                <a class="nav-item nav-link active" href="{{ url_for('home') }}">Home <span class="sr-only">(current)</span></a>
-                <a class="nav-item nav-link" href="{{ url_for('otomoto') }}">Toyota Yaris</a>
-                <a class="nav-item nav-link" href="{{ url_for('form') }}">Pricing</a>
-                <a class="nav-item nav-link" href="{{ url_for('bokeh') }}">Bokeh</a>
-				<a class="nav-item nav-link disabled" href="#">Disabled</a>
+				{% for item in navigation %}
+				<li><a class="nav-item nav-link" href="{{ item.href }}">{{ item.caption }}</a></li>
+				{% endfor %}
             </div>
         </div>
     </nav>
-    <div class="container-fluid p-3 ">
+    <div class="container pt-4 bg-faded">
 
         {% block content %}
 		{% endblock %}
