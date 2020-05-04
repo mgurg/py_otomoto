@@ -1,3 +1,4 @@
+@@ -1,147 +0,0 @@
 from flask import Flask, render_template, redirect, session, url_for, flash, Blueprint
 from flask_wtf import FlaskForm
 from wtforms import StringField, SelectField, BooleanField, SubmitField
