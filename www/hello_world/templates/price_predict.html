@@ -2,20 +2,6 @@
 
 {% block content %}
 
-<!-- <form method="POST" action="{{ url_for('form') }}">
-    {{ form.csrf_token }}
-    {{ form.year.label }}
-    {{ form.year }}
-    {{ form.mileage.label }}
-    {{ form.mileage }}
-    {{ form.fuel }}
-    {{ form.air_conditioning }}
-    {{ form.front_electric_windows }}
-    <input type="submit" value="Submit">
-
-</form> -->
-
-
 <form method="POST" action="{{ url_for('form') }}">
     {{ form.csrf_token }}
     <div class="form-group row">

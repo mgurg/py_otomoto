@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Posty{% endblock %}
+{% block content %}
+    <h2>Posty</h2>
+    <p>
+      Witaj na podstronie, na której wyświetlone są posty z bazy danych.
+      {% for row in data %}
+         <article>
+          <h3>{{ row[0] }}. {{ row[1] }}</h3>
+          <p>{{ row[2] }}</p>
+          <p><i>Autor: {{ row[3] }}</i></p>
+        </article>
+      {% endfor %}
+    </p>
+{% endblock %}
