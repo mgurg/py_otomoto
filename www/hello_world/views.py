@@ -3,36 +3,17 @@ from hello_world import db
 from flask import render_template, flash
 
 from .blueprints.report import report_blueprint
+from .blueprints.pricing import pricing_blueprint
+
 app.register_blueprint(report_blueprint)
+app.register_blueprint(pricing_blueprint)
 
 from .models import posty
-from .forms import CarForm
+
 
 @app.route('/')
 def index():
     return render_template('index.html')
-
-# @app.route('/report')
-# def report():
-#     return render_template('report.html')
-
-@app.route('/pricing', methods=['GET', 'POST'])
-def form():
-    form = CarForm()
-    if form.validate_on_submit():
-        year = int(form.year.data)
-        mileage = int(form.mileage.data)
-
-        feat_dict =	{
-            "air_conditioning": form.air_conditioning.data,
-            "front_electric_windows": form.front_electric_windows.data,
-            }
-
-        features = [form.air_conditioning.data, form.front_electric_windows.data]
-        price = year + mileage
-
-        flash('Wartość samochodu: {}, AC: {}'.format(price, form.air_conditioning.data))
-    return render_template('price_predict.html', form=form)
 
 @app.route('/posts')
 def posts():
@@ -76,28 +57,6 @@ def inject_variables():
         {
             'post_id': 2,
             'title': 'Post numer 2'
-        }],
-        # navigation = [
-        #     {
-        #         'href': '/',
-        #         'caption': 'Home'
-        #     },
-        #     {
-        #         'href': 'report',
-        #         'caption': 'Analiza ogłoszeń'
-        #     },
-        #     {
-        #         'href': 'price_predict',
-        #         'caption': 'Predykcja ceny'
-        #     # },
-        #     # {
-        #     #     'href': 'post',
-        #     #     'caption': 'Posty'
-        #     # },
-        #     # {
-        #     #     'href': 'all-posts',
-        #     #     'caption': 'Posty z DB'
-        #     }
-        # ]
+        }]
         )
 

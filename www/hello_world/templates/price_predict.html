@@ -2,7 +2,7 @@
 
 {% block content %}
 
-<form method="POST" action="{{ url_for('form') }}">
+<form method="POST" action="{{ url_for('pricing_blueprint.form') }}">
     {{ form.csrf_token }}
     <div class="form-group row">
       {{form.year.label(class="col-4 col-form-label",  for="year")}}
