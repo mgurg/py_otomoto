@@ -2,7 +2,7 @@
 
 {% block content %}
 
-<form method="POST" action="{{ url_for('form') }}">
+<form method="POST" action="{{ url_for('pricing_blueprint.form') }}">
     {{ form.csrf_token }}
     <div class="form-group row">
       {{form.year.label(class="col-4 col-form-label",  for="year")}}
@@ -89,6 +89,10 @@
       </div>
     </div>
   </form>
+
+  <p>UWAGA: obecnie za predykcję jest odpowiedzialny dummy model oparty o xgboost,
+    nie bierze on pod uwagę wielu parametrów. COVID-19 spowodował ze bardzo spadła ilość ogloszeń, co wpływa negatywnie
+    na jakość predykcji. Na razie jest to bardziej test współpracy wszystkich elementów niż działający model.</p>
 
   {% for message in get_flashed_messages() %}
 <div class="alert alert-warning">
