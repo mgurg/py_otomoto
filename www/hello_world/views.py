@@ -2,14 +2,12 @@ from hello_world import app
 from hello_world import db
 from flask import render_template, flash
 
+from .models import posty
 from .blueprints.report import report_blueprint
 from .blueprints.pricing import pricing_blueprint
 
 app.register_blueprint(report_blueprint)
 app.register_blueprint(pricing_blueprint)
-
-from .models import posty
-
 
 @app.route('/')
 def index():
