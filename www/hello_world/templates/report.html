@@ -13,15 +13,17 @@
 
     <p>Zależność ceny od rocznika:</p>
     <!-- <img class="img-fluid" src ="./static/img/sns_year.png" > -->
-    <img class="img-fluid" src ="{{ url_for('static', filename='img/sns_sca_year.png') }}" >
+    <!-- <img class="img-fluid" src ="{{ url_for('static', filename='img/sns_sca_year.png') }}" > -->
 
+    {% include './plt/plt_sca_year.html' %}
 
     <p>Cena samochodów:</p>
-    <img class="img-fluid" src ="{{ url_for('static', filename='img/sns_price.png') }}" >
-
+    <!-- <img class="img-fluid" src ="{{ url_for('static', filename='img/sns_price.png') }}" > -->
+    {% include './plt/plt_price.html' %}
 
     <p>Przebieg:</p>
-    <img class="img-fluid" src ="{{ url_for('static', filename='img/sns_mileage.png') }}" >
+    {% include './plt/plt_mileage.html' %}
+    <!-- <img class="img-fluid" src ="{{ url_for('static', filename='img/sns_mileage.png') }}" > -->
 
     <p>Ile dni ogłoszenie jest aktywne:</p>
     <img class="img-fluid" src ="{{ url_for('static', filename='img/sns_duration.png') }}" >

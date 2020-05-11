@@ -1,8 +1,14 @@
 import pandas as pd
 import numpy as np
-import seaborn as sns
+
 import sqlite3
+
 import matplotlib.pyplot as plt
+import seaborn as sns
+
+import plotly.express as px
+import plotly.io as pio
+
 from timeit import default_timer as timer
 import logging
 
@@ -130,6 +136,9 @@ def plot_price():
     plt.savefig('./img/sns_price.png', bbox_inches='tight')
     plt.close()
 
+    plt_price = px.histogram(df, x=df.price, template="presentation")
+    pio.write_html(plt_price, file='./img/plt_price.html', full_html=False, include_plotlyjs='cdn', auto_open=False)
+
 
 def plot_mileage():
     sns.set_style("darkgrid")
@@ -141,6 +150,9 @@ def plot_mileage():
 
     plt.savefig('./img/sns_mileage.png',bbox_inches='tight')
     plt.close()
+
+    plt_mileage = px.histogram(df, x=df.mileage, template="presentation")
+    pio.write_html(plt_mileage, file='./img/plt_mileage.html', full_html=False, include_plotlyjs='cdn', auto_open=False)
 
 def plot_features():
     f = feature_columns()
@@ -157,6 +169,13 @@ def plot_scatter_year():
     sns.stripplot(x="year", y="price_raw", data=df)
     plt.savefig('./img/sns_sca_year.png',bbox_inches='tight')
     plt.close()
+
+    # Use directly Columns as argument. You can use tab completion for this!
+    fig = px.scatter(df, x=df.year, y=df.price_raw, template="presentation")
+    #fig.show()
+
+    #plotly.offline.plot(fig, "file.html")
+    pio.write_html(fig, file='./img/plt_sca_year.html', full_html=False, include_plotlyjs='cdn', auto_open=False)
 
 def num_test():
     A = np.matrix([[1.], [3.]])

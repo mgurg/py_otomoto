@@ -20,6 +20,6 @@ def form():
 
         price = calulate_price(feat_dict)
 
-        flash('Wartosc samochodu: {}, AC: {}'.format(price, form.air_conditioning.data))
+        flash('Wartosc samochodu: {:.2f}, AC: {}'.format(price, form.air_conditioning.data))
     return render_template('price_predict.html', form=form)
 
