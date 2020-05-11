@@ -10,17 +10,21 @@
 *.db
 *.db-journal
 *.txt
+*.pkl
+*.json
 # *.ipynb
 myproject.py
 
 # ignore folders
 data
-.vscode
+.vscode/
 .ipynb_checkpoints
-archive
-old
-scrapy
-offers
+archive/
+old/
+scrapy/
+offers/
+img/
+plt/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
