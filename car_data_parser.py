@@ -7,7 +7,7 @@ import os
 import pandas as pd
 import shutil
 from datetime import datetime
-from dbData import create_connection,create_table,execute_query,fetch_all_data,fetch_single_item
+from db_data import create_connection,create_table,execute_query,fetch_all_data,fetch_single_item
 
 def copy_data():
     now = datetime.now()
