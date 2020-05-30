@@ -15,7 +15,6 @@ import logging
 # Necessary to run script on VM machine
 import os
 def openblas_setup():
-
     logging.basicConfig(filename='plot.log',
                             filemode='a',
                             format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
@@ -33,9 +32,11 @@ def openblas_setup():
     #os.environ["OPENBLAS_CORETYPE"] = "prescott"
     #os.environ["OMP_NUM_THREADS"] = "1"
     #os.environ["OPENBLAS_VERBOSE"] =2
-    p = os.getenv("OPENBLAS_CORETYPE")
+    return os.getenv("OPENBLAS_CORETYPE")
 
-    print(p)
+
+def sums(i):
+    return 6
 
 def get_sqlite_data():
     sql_query ="""SELECT * FROM v_cars;"""

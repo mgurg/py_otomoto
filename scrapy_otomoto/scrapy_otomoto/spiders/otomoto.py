@@ -59,7 +59,7 @@ class OtomotoSpider(scrapy.Spider):
 
         now = datetime.datetime.now()
 
-        with open('./otomoto_'+now.strftime('%Y%m%d')+'.html', 'a',encoding='utf-8') as f:
+        with open('./otomoto_'+now.strftime('%Y%m%d')+'.html', 'w',encoding='utf-8') as f:
             for item in offers:
 				# remove double spaces to shrink file size
                 f.write("%s" % item.replace("  ", ""))
@@ -70,7 +70,7 @@ class OtomotoSpider(scrapy.Spider):
             # use json.dump(lista_items, f, indent=4) to "pretty-print" with four spaces per indent
             #json.dump(data, j, indent=4)
 
-        with open('./otomoto_'+now.strftime('%Y%m%d')+'.txt', 'a',encoding='utf-8') as u:
+        with open('./otomoto_'+now.strftime('%Y%m%d')+'.txt', 'w',encoding='utf-8') as u:
             for url_item in offer_url:
                 u.write("%s\n" % url_item)
 
@@ -113,6 +113,6 @@ class OtomotoSpider(scrapy.Spider):
 
         print(abs_file_path)
 
-        with open(abs_file_path, "a+") as text_file:
+        with open(abs_file_path, "w") as text_file:
             text_file.write(result.group(2))
 
