@@ -3,7 +3,7 @@ import os
 from sqlite3 import Error
 import yaml
 
-with open("D:\Github\py_otomoto\py_otomoto\config.yml", "r") as ymlfile:
+with open('config.yml', 'r') as ymlfile:
     cfg = yaml.load(ymlfile, Loader=yaml.SafeLoader)
 
 # create a default path to connect to and create (if necessary) a database
@@ -37,7 +37,7 @@ def execute_query(connection, query):
     try:
         cursor.execute(query)
         connection.commit()
-        print("Query executed successfully")
+        # print("Query executed successfully")
     except Error as e:
         print(f"The error '{e}' occurred")
 

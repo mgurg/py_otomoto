@@ -48,7 +48,7 @@ def copy_data():
             except OSError as err:
                 print(err)
 
-def get_files_list(connection):
+def get_files_dict(connection):
     """Compare files on HDD with SQLite database to select files for parsing"""
 
     table_id_sql = """
@@ -59,21 +59,28 @@ def get_files_list(connection):
     ORDER BY name ASC;"""
 
     table_id = fetch_db_data(connection, table_id_sql, all=True)
-    db_files = [name[0]+'.html' for name in table_id]  # conert DB table names to file names
+    db_files = [name[0]+'.html' for name in table_id]  # convert DB table names to file names
 
     files = []
     for file in os.listdir(cfg['paths']['dst']):
         if file.endswith(".html"):
             files.append(file)
-            #files.append(os.path.join(abs_file_path, file))
 
     files_list = list(set(files).difference(db_files))
-
-    #print('DB: ',db_files)
-    #print('HDD: ', files)
+    files_list.sort()
     print('Files to process: ', *files_list)
 
-    return files_list
+    files_dict = {}
+
+    for item in files_list:
+        feats_list = []
+        for feats in os.listdir(cfg['paths']['dst'] + item.split('.')[0][8:] + '/'):
+            if feats.endswith('.html'):
+                feats_list.append(feats)
+
+        files_dict[item] = feats_list
+
+    return files_dict
 
 
 def parse_html2db(connection, html_file : str):
@@ -83,10 +90,11 @@ def parse_html2db(connection, html_file : str):
     f_name = html_file.split('.')[0]
     f_date = f_name.split('_')[1]
 
-
     try:
-        carSoup = bs4.BeautifulSoup(io.open(f_path, mode='r', encoding='utf-8'), 'lxml')
+        with open(f_path,'r',encoding='utf-8') as f:
+            carSoup = bs4.BeautifulSoup(f.read(), 'lxml')
         carList = carSoup.select('article.offer-item')
+
     except FileNotFoundError:
         print(f'{html_file} not found!')
         return None
@@ -100,40 +108,22 @@ def parse_html2db(connection, html_file : str):
     sql_list=[sql_header]
 
     for car in carList:
-        # TODO: test regex performance
-            #OfferId = car.find_all(re.compile("data-ad-id=\"(.*?)\""))
-            #OfferId = re.search("(data-ad-id=)\"(.*?)\"", car)[0]
-
         offer_id = car.find("a")['data-ad-id']
         city = car.find('span',class_='ds-location-city').text.strip()
-        region = car.find('span',class_='ds-location-region').text[1:-1].strip()
+        # region = car.find('span',class_='ds-location-region').text[1:-1].strip()
         model = car.find('a',class_='offer-title__link').text.strip()
-
-        #params = car.find("li", class_='ds-param')
         year = car.find("li", {"data-code" : "year"}).text.strip()
         mileage = car.find("li", {"data-code" : "mileage"}).text[:-3].replace(" ", "").strip()
-
-
         url = car.find("a")['href'].split("#")[0]
         uid = url[-13:-5]
-        #print(uid)
-
-        # TODO: Performance check:
-        # try:
-        #     displacement = car.find("li", {"data-code" : "engine_capacity"}).text[:-3].replace(" ", "")
-        # except AttributeError:
-        #     print(offer_id + ' no displacement value')
-        #     displacement = -1
 
         displacement = car.find("li", {"data-code" : "engine_capacity"})
         if displacement is not None:
             displacement = displacement.get_text()[:-4].replace(" ", "").strip()
         else:
-            # print(offer_id + ' no displacement value')
             displacement = str(-1)
 
         #fuel_type = car.find("li", {"data-code" : "fuel_type"}).text.strip()
-
         car_value = car.find('span',class_='offer-price__number').text.replace(" ", "")
         price = car_value.splitlines()[1]
         currency = str(car_value.splitlines()[2]) #currency = price[len(price)-4:].strip()
@@ -149,7 +139,7 @@ def parse_html2db(connection, html_file : str):
                     price=price,
                     currency=currency,
                     s_date = "{}{}{}{}-{}{}-{}{}".format(*f_date),  # "2020-04-17",
-                    e_date = "{}{}{}{}-{}{}-{}{}".format(*f_date),  # "2020-04-17",
+                    e_date = "{}{}{}{}-{}{}-{}{}".format(*f_date)  # "2020-04-17",
                     )
 
         sql_list.append(sql_row.strip()+'\n')
@@ -173,11 +163,12 @@ def parse_html2db(connection, html_file : str):
     query_content = '(' + ''.join(sql_list) + ')'.strip()
     last_char_index = query_content.rfind(",")  # remove last ,
     sql_content = query_content[:last_char_index] + ';'
-    # print(sql_content)
+
     execute_query(connection, sql_content[1:].strip())
 
 
 def merge_sql(connection):
+    '''merge single car offers into one table'''
 
     table_id_sql = """
     SELECT name
@@ -187,7 +178,7 @@ def merge_sql(connection):
     ORDER BY name ASC;"""
 
     table_id = fetch_db_data(connection, table_id_sql, all=True)
-    print(''.join(table_id[-1]))
+    print('ASC:',''.join(table_id[-1]))
 
     temp_table = """--create temporary table
     CREATE TABLE IF NOT EXISTS "temp_table" (
@@ -244,7 +235,7 @@ def merge_sql(connection):
     -- clean temp table
     delete from temp_table;"""
 
-    # create tables if missing
+    # create tables if are missing
     execute_query(connection, temp_table)
     execute_query(connection, all_table)
 
@@ -261,20 +252,8 @@ def merge_sql(connection):
 
 # -----------------------------------------------------------------
 
-def get_feature_files(fname):
-    files = []
-    dirname =  fname.split('_')[1][:-5]
-    src =  os.path.join(cfg['paths']['dst'] + dirname)
-
-    for file in os.listdir(src):
-        if file.endswith(".html"):
-            files.append(file)
-    print('Feature files from', dirname, ':', len(files) )
-    return files
-
 def parse_json_key(json, key):
-    # check whether key exist
-    # if yes flatten list to string
+    '''check whether key exist, if yes flatten list to string'''
     try:
         buf = json[key]
         if type(json[key]) == list:
@@ -285,9 +264,9 @@ def parse_json_key(json, key):
     return buf
 
 def parse_json2sql(fname, dirname):
+    '''parse JSON content and return list of car details'''
     file_path =  os.path.join(cfg['paths']['dst'] + dirname + '/' + fname)
 
-    print(file_path)
     with open(file_path) as f:
         data = json.load(f)
 
@@ -326,6 +305,8 @@ def parse_json2sql(fname, dirname):
 
 
 def store_car_sql(connection, fname, dirname):
+    ''' Store in SQLite car details obtained from JSON files'''
+
     table_name = 'all_offers'
 
     car_table_sql ="""CREATE TABLE IF NOT EXISTS "{table_name}" (
@@ -375,31 +356,21 @@ def main():
     conn = create_connection()
 
     copy_data()
-    files = get_files_list(conn)
+    files = get_files_dict(conn)
 
-    if not files:
-        print('Nothing to do')
-    else:
-        for f in files:
-            print('....',f,'....')
-            parse_html2db(conn, f)
-            merge_sql(conn)
-            feat_dir = get_feature_files(f)
-
-            if not feat_dir:
-                print("No features to process")
-            else:
-                dirname = f.split('_')[1][:-5]
-                for feats in feat_dir:
-                    store_car_sql(conn, feats, dirname)
-            print('Feats:', feat_dir)
-        print(f, '- done')
+    for key, value in files.items():
+        print('...' + key + '...')
+        parse_html2db(conn, key)
+        merge_sql(conn)
+        for item in value:
+            dirname = key.split('_')[1][:-5]
+            store_car_sql(conn, item, dirname)
+        print('Car offers from', dirname, ':', len(value))
 
     conn.close()
     end = timer()
     print(end - start)
 
-#--------------------------------------------------#
 
 if __name__ == "__main__":
     main()

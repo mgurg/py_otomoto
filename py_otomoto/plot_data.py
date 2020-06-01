@@ -157,7 +157,16 @@ def plot_mileage():
 
 def plot_features():
     f = feature_columns()
-    df[f].hist(bins=2,figsize=(15,15))
+    fig = plt.figure(figsize=(20, 25))
+    fig.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=None, hspace=0.5)
+    fig.add_axes([0.1 ,0.1 ,0.8, 0.8])
+    for i in range(len(f)):
+        cnt = df[f[i]].value_counts()
+        plt.subplot(10,6,i+1)
+        plt.xticks(np.arange(2), ['Brak', 'Jest'])
+        plt.bar(cnt.index, cnt.values, align='center')
+        key = f[i][2:]
+        plt.title(key)
     plt.savefig('./img/sns_features.png',bbox_inches='tight')
     plt.close()
 
