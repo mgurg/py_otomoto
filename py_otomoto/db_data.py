@@ -3,7 +3,7 @@ import os
 from sqlite3 import Error
 import yaml
 
-with open("config.yml", "r") as ymlfile:
+with open('config.yml', 'r') as ymlfile:
     cfg = yaml.load(ymlfile, Loader=yaml.SafeLoader)
 
 # create a default path to connect to and create (if necessary) a database
@@ -31,12 +31,13 @@ def create_table(conn, create_table_sql):
     except Error as e:
         print(e)
 
+
 def execute_query(connection, query):
     cursor = connection.cursor()
     try:
         cursor.execute(query)
         connection.commit()
-        print("Query executed successfully")
+        # print("Query executed successfully")
     except Error as e:
         print(f"The error '{e}' occurred")
 
