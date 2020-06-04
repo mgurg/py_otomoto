@@ -1,0 +1,133 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="p-3" >
+    <h1>Toyota Yaris II</h1>
+    <div class="p-3">
+    <p>Nazwa kodowa: XP90, Okres produkcji: 2005–2011.</p>
+    <p>Dodatkowe informacje:
+    <a href="https://www.autocentrum.pl/dane-techniczne/toyota/yaris/ii/">portal Autocentrum</a>,
+    <a href="https://pl.wikipedia.org/wiki/Toyota_Yaris#Druga_generacja">Wikipedia</a>
+    </p>
+
+    <p>Projekt edukacyjny do nauki ML. Postanowiłem analizować ceny Toyoty Yaris II i na podstawie informacji z ogłoszeń
+        przewidywać cenę samochodu w zależności od jego wyposażenia i kondycji.</p>
+
+    <p>Pod koniec ubiegłego roku sprzedawałem ten model samochodu i miałem wtedy dużą trudność żeby określić jego wartość.
+        Zależało mi żeby sprzedać go korzystnie, ale w rozsądnym czasie.</p>
+
+    <p>Predykcja ceny i próby szacowania jak auto będzie czekało na kupca to cele tego projektu. Chcę się nauczyć rozwiązywać
+        problemy związane z pozyskiwaniem danych danych, automatyzacją tego procesu, wizualizacja wyników,
+        feature engineering, predykcją i utrzymywaniem serwisu.</p>
+
+    <p>Obecnie wszystkie elementy projektu posiafdają minimalną funkcjonalność. Obecnie jestem na etapie zbierania
+        danych.</p>
+    </div>
+    <h2>Jupyter Notebook</h2>
+    <p  class="p-3">Jupyter Notebook - <a href="https://nbviewer.jupyter.org/github/mgurg/py_otomoto/blob/master/py_otomoto.ipynb">kliknij żeby przeglądać online</a> </p>
+
+    <h2>Github</h2>
+    <p>Link do projektu na <a href="https://github.com/mgurg/py_otomoto" >Github</a></p>
+    <h2>Dostępne dane:</h2>
+    <ul class="list-unstyled ml-3">
+        <li><mark>offer_id</mark> - unikalny numer ogłoszenia</li>
+        <li><mark>s_date</mark> - data publikacji ogłoszenia</li>
+        <li><mark>e_date</mark> - data zakończenia ogłoszenia</li>
+        <li><mark>private_business</mark> - oferta od osoby prywatnej/firmy</li>
+        <li><mark>region</mark> - województwo</li>
+        <li><mark>city</mark> - miasto</li>
+        <li><mark>model</li>
+        <li><mark>year</mark> - rok produkcji</li>
+        <li><mark>mileage</mark> - przebieg</li>
+        <li><mark>engine_capacity</mark> - pojemność silnika</li>
+        <li><mark>vin</mark> - numer nadwozia</li>
+        <li><mark>fuel_type</mark> - rodzaj paliwa</li>
+        <li><mark>engine_power</mark> - moc silnika</li>
+        <li><mark>gearbox</mark> - rodzaj skrzyni biegów</li>
+        <li><mark>transmission</mark> - napędzane koła</li>
+        <li><mark>door_count</mark> - liczba drzwi</li>
+        <li><mark>nr_seats</mark> - liczba miejsc</li>
+        <li><mark>color</mark> - kolor</li>
+        <li><mark>features</mark> - wyposażenie</li>
+        <li><mark>price</mark> - cena</li>
+        <li><mark>price_raw</mark> - cena</li>
+        <li><mark>currency</mark> - waluta</li>
+        <li><mark>country_origin</mark> - kraj pochodzenia</li>
+        <li><mark>registration</mark> </li>
+    </ul>
+<h3>Wyposażenie:</h3>
+    <ul class="list-unstyled ml-3">
+        <li>abs : ABS</li>
+        <li>cd : CD</li>
+        <li>central-lock : Centralny zamek</li>
+        <li>front-electric-windows : Elektryczne szyby przednie</li>
+        <li>electronic-rearview-mirrors : Elektrycznie ustawiane lusterka</li>
+        <li>electronic-immobiliser : Immobilizer</li>
+        <li>front-airbags : Poduszka powietrzna kierowcy</li>
+        <li>front-passenger-airbags : Poduszka powietrzna pasażera</li>
+        <li>original-radio : Radio fabryczne</li>
+        <li>assisted-steering : Wspomaganie kierownicy</li>
+        <li>alarm : Alarm</li>
+        <li>alloy-wheels : Alufelgi</li>
+        <li>asr : ASR (kontrola trakcji)</li>
+        <li>park-assist : Asystent parkowania</li>
+        <li>lane-assist : Asystent pasa ruchu</li>
+        <li>bluetooth : Bluetooth</li>
+        <li>automatic-wipers : Czujnik deszczu</li>
+        <li>blind-spot-sensor : Czujnik martwego pola</li>
+        <li>automatic-lights : Czujnik zmierzchu</li>
+        <li>both-parking-sensors : Czujniki parkowania przednie</li>
+        <li>rear-parking-sensors : Czujniki parkowania tylne</li>
+        <li>panoramic-sunroof : Dach panoramiczny</li>
+        <li>electric-exterior-mirror : Elektrochromatyczne lusterka boczne</li>
+        <li>electric-interior-mirror : Elektrochromatyczne lusterko wsteczne</li>
+        <li>rear-electric-windows : Elektryczne szyby tylne</li>
+        <li>electric-adjustable-seats : Elektrycznie ustawiane fotele</li>
+        <li>esp : ESP (stabilizacja toru jazdy)</li>
+        <li>aux-in : Gniazdo AUX</li>
+        <li>sd-socket : Gniazdo SD</li>
+        <li>usb-socket : Gniazdo USB</li>
+        <li>towing-hook : Hak</li>
+        <li>head-display : HUD (wyświetlacz przezierny)</li>
+        <li>isofix : Isofix</li>
+        <li>rearview-camera : Kamera cofania</li>
+        <li>automatic-air-conditioning : Klimatyzacja automatyczna</li>
+        <li>quad-air-conditioning : Klimatyzacja czterostrefowa</li>
+        <li>dual-air-conditioning : Klimatyzacja dwustrefowa</li>
+        <li>air-conditioning : Klimatyzacja manualna</li>
+        <li>onboard-computer : Komputer pokładowy</li>
+        <li>side-window-airbags : Kurtyny powietrzne</li>
+        <li>shift-paddles : Łopatki zmiany biegów</li>
+        <li>mp3 : MP3</li>
+        <li>gps : Nawigacja GPS</li>
+        <li>dvd : Odtwarzacz DVD</li>
+        <li>speed-limiter : Ogranicznik prędkości</li>
+        <li>auxiliary-heating : Ogrzewanie postojowe</li>
+        <li>heated-windshield : Podgrzewana przednia szyba</li>
+        <li>heated-rearview-mirrors : Podgrzewane lusterka boczne</li>
+        <li>front-heated-seats : Podgrzewane przednie siedzenia</li>
+        <li>rear-heated-seats : Podgrzewane tylne siedzenia</li>
+        <li>driver-knee-airbag : Poduszka powietrzna chroniąca kolana</li>
+        <li>front-side-airbags : Poduszki boczne przednie</li>
+        <li>rear-passenger-airbags : Poduszki boczne tylne</li>
+        <li>tinted-windows : Przyciemniane szyby</li>
+        <li>radio : Radio niefabryczne</li>
+        <li>adjustable-suspension : Regulowane zawieszenie</li>
+        <li>roof-bars : Relingi dachowe</li>
+        <li>system-start-stop : System Start-Stop</li>
+        <li>sunroof : Szyberdach</li>
+        <li>daytime-lights : Światła do jazdy dziennej</li>
+        <li>leds : Światła LED</li>
+        <li>fog-lights : Światła przeciwmgielne</li>
+        <li>xenon-lights : Światła Xenonowe</li>
+        <li>leather-interior : Tapicerka skórzana</li>
+        <li>velour-interior : Tapicerka welurowa</li>
+        <li>cruise-control : Tempomat</li>
+        <li>active-cruise-control : Tempomat aktywny</li>
+        <li>tv : Tuner TV</li>
+        <li>steering-whell-comands : Wielofunkcyjna kierownica</li>
+        <li>cd-changer : Zmieniarka CD</li>
+    </ul>
+</div>
+
+{% endblock %}

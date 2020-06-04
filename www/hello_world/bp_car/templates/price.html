@@ -1,8 +1,8 @@
-{% extends "base.html" %}
+{% extends "layout.html" %}
 
 {% block content %}
 
-<form method="POST" action="{{ url_for('pricing_blueprint.form') }}">
+<form method="POST" action="{{ url_for('car_bp.form') }}">
     {{ form.csrf_token }}
     <div class="form-group row">
       {{form.year.label(class="col-4 col-form-label",  for="year")}}
@@ -53,6 +53,18 @@
       </div>
     </div>
     <div class="form-group row">
+      {{form.doors.label(class="col-4 col-form-label",  for="fuel")}}
+      <!-- <label for="fuel" class="col-4 col-form-label">Paliwo</label> -->
+      <div class="col-8">
+        {{  form.doors(class="custom-select")  }}
+        <!-- <select id="fuel" name="fuel" class="custom-select">
+          <option value="petrol">Benzyna</option>
+          <option value="diesesl">Diesel</option>
+          <option value="petrol-lpg">Benzyna+LPG</option>
+        </select> -->
+      </div>
+    </div>
+    <div class="form-group row">
       <label class="col-4">Wyposażenie</label>
       <div class="col-8">
         <div class="custom-control custom-checkbox custom-control-inline">
@@ -69,17 +81,38 @@
           <label for="features_1" class="custom-control-label">Elektryczne szyby przednie</label> -->
         </div>
         <div class="custom-control custom-checkbox custom-control-inline">
-          <input name="features" id="features_2" type="checkbox" class="custom-control-input" value="central-lock">
-          <label for="features_2" class="custom-control-label">Centralny zamek</label>
+          {{ form.central_lock(class="custom-control-input")  }}
+          {{ form.central_lock.label(class="custom-control-label")}}
         </div>
         <div class="custom-control custom-checkbox custom-control-inline">
-          <input name="features" id="features_3" type="checkbox" class="custom-control-input" value="alloy-wheels">
-          <label for="features_3" class="custom-control-label">Alufelgi</label>
+          {{ form.alloy_wheels(class="custom-control-input")  }}
+          {{ form.alloy_wheels.label(class="custom-control-label")}}
         </div>
         <div class="custom-control custom-checkbox custom-control-inline">
+          {{ form.rear_parking_sensors(class="custom-control-input")  }}
+          {{ form.rear_parking_sensors.label(class="custom-control-label")}}
+        </div>
+
+        <div class="custom-control custom-checkbox custom-control-inline">
+          {{ form.mp3(class="custom-control-input")  }}
+          {{ form.mp3.label(class="custom-control-label")}}
+        </div>
+
+        <div class="custom-control custom-checkbox custom-control-inline">
+          {{ form.fog_lights(class="custom-control-input")  }}
+          {{ form.fog_lights.label(class="custom-control-label")}}
+        </div>
+
+        <div class="custom-control custom-checkbox custom-control-inline">
+          {{ form.steering_whell_comands(class="custom-control-input")  }}
+          {{ form.steering_whell_comands.label(class="custom-control-label")}}
+        </div>
+
+        <!-- <div class="custom-control custom-checkbox custom-control-inline">
           <input name="features" id="features_4" type="checkbox" class="custom-control-input" value="steering-whell-comands">
           <label for="features_4" class="custom-control-label">Wielofunkcyjna kierownica</label>
-        </div>
+        </div> -->
+
       </div>
     </div>
     <div class="form-group row">
