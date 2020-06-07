@@ -42,7 +42,7 @@ def form():
 
         price = calulate_price(car_details)
 
-        flash('''Wartosc samochodu: {:.2f} \n
+        flash('''Wartosc samochodu: {:.2f},
                 Klimatyzacja: {},
                 Elektryczne szyby przednie: {},
                 Centralny zamek: {},

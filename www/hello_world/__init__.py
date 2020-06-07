@@ -3,9 +3,6 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 
-
-
-
 db = SQLAlchemy()
 login_manager = LoginManager()
 
@@ -23,12 +20,14 @@ def create_app():
         from . import routes
         from . import auth
         from .bp_car import car
+        from .bp_sudoku import sudoku
         # from .assets import compile_static_assets
 
         # Register Blueprints
         app.register_blueprint(routes.main_bp)
         app.register_blueprint(auth.auth_bp)
         app.register_blueprint(car.car_bp)
+        app.register_blueprint(sudoku.sudoku_bp)
 
         # Create Database Models
         db.create_all()

@@ -12,10 +12,12 @@
 
     <h1>Log In</h1>
 
+
     <form method="POST" action="/login">
       {{ form.csrf_token }}
 
       <fieldset class="email">
+
         {{ form.email.label }}
         {{ form.email(placeholder='youremail@example.com') }}
         {% if form.email.errors %}
