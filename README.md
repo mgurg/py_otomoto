@@ -22,13 +22,6 @@ This will generate `otomoto_YYMMDD.html` file with all cars that are currently a
 
 Result is stored in SQLite database
 
-## www
-
-Simple flask application for visualization of data. Preview: [remontmaszyn.pl](http://remontmaszyn.pl)
-
-![](http://remontmaszyn.pl/static/img/mainpage.jpg)
-
-
 
 ---
 
