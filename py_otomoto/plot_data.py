@@ -130,6 +130,8 @@ def plot_duration():
     logging.info("Running plot_duration")
 
 def plot_price():
+    config = {"displayModeBar": False, "showTips": False}
+
     sns.set_style("darkgrid")
     sns.set(rc={'figure.figsize':(15,5)})
     chart = sns.distplot(df['price'], bins=20, kde=False, rug=True)
@@ -138,10 +140,13 @@ def plot_price():
     plt.close()
 
     plt_price = px.histogram(df, x=df.price, template="presentation")
-    pio.write_html(plt_price, file='./img/plt_price.html', full_html=False, include_plotlyjs='cdn', auto_open=False)
+    pio.write_html(plt_price, file='./img/plt_price.html', full_html=False, include_plotlyjs='cdn',
+                    auto_open=False, config=config)
 
 
 def plot_mileage():
+    config = {"displayModeBar": False, "showTips": False}
+
     sns.set_style("darkgrid")
     #plt.figure(figsize=(15,5))
     sns.set(rc={'figure.figsize':(15,5)})
@@ -153,7 +158,8 @@ def plot_mileage():
     plt.close()
 
     plt_mileage = px.histogram(df, x=df.mileage, template="presentation")
-    pio.write_html(plt_mileage, file='./img/plt_mileage.html', full_html=False, include_plotlyjs='cdn', auto_open=False)
+    pio.write_html(plt_mileage, file='./img/plt_mileage.html', full_html=False, include_plotlyjs='cdn',
+                auto_open=False, config=config)
 
 def plot_features():
     f = feature_columns()
@@ -172,6 +178,8 @@ def plot_features():
 
 
 def plot_scatter_year():
+    config = {"displayModeBar": False, "showTips": False}
+
     plt.figure(figsize=(15, 5))
     plt.title('price vs year')
     plt.xlabel('year')
@@ -185,7 +193,8 @@ def plot_scatter_year():
     #fig.show()
 
     #plotly.offline.plot(fig, "file.html")
-    pio.write_html(fig, file='./img/plt_sca_year.html', full_html=False, include_plotlyjs='cdn', auto_open=False)
+    pio.write_html(fig, file='./img/plt_sca_year.html', full_html=False, include_plotlyjs='cdn',
+                    auto_open=False, config=config)
 
 def num_test():
     A = np.matrix([[1.], [3.]])
